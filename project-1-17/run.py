@@ -4,124 +4,141 @@ import shutil
 # import pytest #DEPENDENCIES: pip install pytest
 import os
 import re
+import logging
 
 if len(sys.argv) != 2:
     print("\ncorrect format: ./python run.py <some-filename>.txt\n")
-    exit(1)
+    sys.exit(1)
 
-filename = sys.argv[1]
+FILE_NAME = sys.argv[1]
 
-if filename == "install":
-    exit(0)
+if FILE_NAME == "install":
+    sys.exit(0)
 
 from url import URL  # Import class data after dependencies are installed
 
-urlData = URL()
-urlArray = []
+url_data = URL()
+url_array = []
 
-if filename == "test":
+# Configure logging
+try:
+    log_file = os.environ['LOG_FILE']
+except KeyError:
+    logging.error("Couldn't find environment variable for 'LOG_FILE'")
+    sys.exit()
+
+try:
+    LOG_LEVEL = os.environ['LOG_LEVEL']
+except KeyError:
+    logging.error("Couldn't find environment variable for 'LOG_LEVEL'")
+    sys.exit()
+
+# Initialize
+
+if LOG_LEVEL == '0':
+    LOGGING_LEVEL = logging.NOTSET
+elif LOG_LEVEL == '1':
+    LOGGING_LEVEL = logging.INFO
+elif LOG_LEVEL == '2':
+    LOGGING_LEVEL = logging.DEBUG
+else:
+    logging.error("Log level %s is not defined", LOG_LEVEL)
+    sys.exit()
+
+logging.basicConfig(filename=log_file, level=LOG_LEVEL)
+
+
+if FILE_NAME == "test":
     if os.path.isdir("repo"):
-        if int(os.getenv('LOG_LEVEL')) > 1:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print('Deleting exising repository folder...', file=logFile)
-            logFile.close()
+        logging.info('Deleting exising repository folder...')
         shutil.rmtree('repo', ignore_errors=True)
     prevLogLevel = os.getenv('LOG_LEVEL')
     os.environ['LOG_LEVEL'] = '2'  # Set highest log level for best coverage/testing of log capabilities
-    if int(os.getenv('LOG_LEVEL')) > 0:
-        logFile = open(os.getenv('LOG_FILE'), 'w')
-        print("running test package...\n", file=logFile)
-        logFile.close()
+    logging.info("running test package...")
 
-    filename = 'test/testFile.txt'
+    FILE_NAME = 'test/testFile.txt'
     os.system("coverage run -m pytest test_run.py > test/log.txt")
     os.system("coverage report >> test/log.txt")
-    testLog = open('test/log.txt', 'r')
-    results = testLog.read()
+    with open('test/log.txt', 'r', encoding='UTF-8') as testLog:
+        results = testLog.read()
 
-    numPassed = re.search('\d* passed', results)
-    if numPassed is not None:
-        if not numPassed[0][0:-7] == '':
-            numPassed = int(numPassed[0][0:-7])
+    num_passed = re.search('\d* passed', results)
+    if num_passed is not None:
+        if not num_passed[0][0:-7] == '':
+            num_passed = int(num_passed[0][0:-7])
         else:
-            numPassed = 0
+            num_passed = 0
     else:
-        numPassed = 0
+        num_passed = 0
 
-    numFailed = re.search('\d* failed', results)
-    if numFailed is not None:
-        if not numFailed[0][0:-7] == '':
-            numFailed = int(numFailed[0][0:-7])
+    num_failed = re.search('\d* failed', results)
+    if num_failed is not None:
+        if not num_failed[0][0:-7] == '':
+            num_failed = int(num_failed[0][0:-7])
         else:
-            numFailed = 0
+            num_failed = 0
     else:
-        numFailed = 0
+        num_failed = 0
 
     coverage = re.findall('\d{1,3}%', results)[-1]
-    total = numPassed + numFailed
+    total = num_passed + num_failed
 
-    print('Total: {}'.format(total))
-    print('Passed: {}'.format(numPassed))
-    print('Failed: {}'.format(numFailed))
-    print('Coverage: ' + coverage)
-    print('{}/{} test cases passed. '.format(numPassed, total) + coverage + ' line coverage achieved.')
+    print(f'Total: {total}')
+    print(f'Passed: {num_passed}')
+    print(f'Failed: {num_failed}')
+    print(f'Coverage: {coverage}')
+    print(f'{num_passed}/{total} test cases passed. {coverage} line coverage achieved.')
 
-    if int(os.getenv('LOG_LEVEL')) > 0:
-        logFile = open(os.getenv('LOG_FILE'), 'a')
-        print("\nTests completed, exiting...", file=logFile)
-        logFile.close()
+    logging.info("\nTests completed, exiting...")
     os.environ['LOG_LEVEL'] = prevLogLevel  # Return to original log level
     shutil.rmtree('repo', ignore_errors=True)
-    exit(0)
+    sys.exit(0)
 
 # Check for valid filename
 try:
-    with open(filename, 'r') as file:
+    with open(FILE_NAME, 'r', encoding='UTF-8') as file:
         text = file.read()
 except Exception:
-    print("ERROR: Specified file '{}' not found!\nExiting...".format(filename))
-    exit(1)
+    logging.error("ERROR: Specified file '%s' not found!\nExiting...", FILE_NAME)
+    sys.exit(1)
 
 URLs = text.split()
 
 print('URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE')
 
-for urlIdx in URLs:
+for url_idx in URLs:
     # Check if URL needs to be converted
-    urlData = URL()
-    urlData.url = urlIdx
-    if 'npmjs.com' in urlIdx:
-        urlData.convert_npm_to_github()
+    url_data = URL()
+    url_data.url = url_idx
+    if 'npmjs.com' in url_idx:
+        url_data.convert_npm_to_github()
 
-    urlData.set_owner()
+    url_data.set_owner()
     # Check for valid repo
-    if urlData.owner == -1:
-        urlData.net_score = -1
+    if url_data.owner == -1:
+        url_data.net_score = -1
         continue
-    urlData.set_repo()
+    url_data.set_repo()
     # Check for valid repo
-    if urlData.repo == -1:
-        urlData.net_score = -1
+    if url_data.repo == -1:
+        url_data.net_score = -1
         continue
-    urlData.get_bus_factor()
-    urlData.get_responsiveness()
-    urlData.get_ramp_up()
-    urlData.get_correctness()
-    urlData.get_license()
-    urlData.get_net_score()
-    urlArray.append(urlData)
+    url_data.get_bus_factor()
+    url_data.get_responsiveness()
+    url_data.get_ramp_up()
+    url_data.get_correctness()
+    url_data.get_license()
+    url_data.get_net_score()
+    url_array.append(url_data)
 
-sortedURLS = sorted(urlArray, key=(lambda getNet: getNet.net_score), reverse=True)
-for url in sortedURLS:
+sorted_urls = sorted(url_array, key=(lambda getNet: getNet.net_score), reverse=True)
+for url in sorted_urls:
     print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
         url.bus_factor) +
           ' ' + str(url.response) + ' ' + str(url.license))
 
 file.close()
 shutil.rmtree('repo', ignore_errors=True)
-if int(os.getenv('LOG_LEVEL')) > 0:
-    logFile = open(os.getenv('LOG_FILE'), 'a')
-    print("Successfully closing...", file=logFile)
-    logFile.close()
+logging.info("Successfully closing...")
 
-exit(0)
+sys.exit(0)

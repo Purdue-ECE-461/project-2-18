@@ -1,10 +1,10 @@
-from datetime import datetime as dt  # pip install datetime
-from git import Repo  # pip install GitPython
 import shutil
 import os
 import re
 import logging
 import sys
+from datetime import datetime as dt  # pip install datetime
+from git import Repo  # pip install GitPython
 import requests  # pip install PyGithub requests
 
 
@@ -58,7 +58,7 @@ class URL:
         # Check if repo was found
         if git_hub_url is None:
             logging.error("ERROR: GitHub URL not found from NPM site")
-            return None
+            return
 
         repo = git_hub_url.group()[14:-12]
         self.url = repo
@@ -76,9 +76,9 @@ class URL:
     def set_repo(self):
         logging.info("Getting repo for URL %s...", self.url)
 
-        repoString = re.search(self.owner + '/.*', self.url)
+        repo_string = re.search(self.owner + '/.*', self.url)
         try:
-            self.repo = repoString.group()[len(self.owner) + 1:]
+            self.repo = repo_string.group()[len(self.owner) + 1:]
         except Exception:
             logging.error("Invalid URL '%s', skipping tests", self.url)
 
@@ -100,13 +100,13 @@ class URL:
         header = {'Authorization': f'token {pat}'}
 
         # Formats URL to be in form 'https://api.github.com/repos/{owner}/{repo}/contributors'
-        formattedURL = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/contributors'
+        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/contributors'
 
         # Obtains list of up to 100 contributors for specified repository, if possible
         # Otherwise, prints error message and exits 1
-        response = requests.get(formattedURL, headers=header, params={'per_page': 100})
+        response = requests.get(formatted_url, headers=header, params={'per_page': 100})
         try:
-            numContributors = len(response.json()) + 1
+            num_contributors = len(response.json()) + 1
         except Exception:
             logging.error("Error getting bus factor score with URL '%s'", self.url)
 
@@ -115,10 +115,10 @@ class URL:
 
         # Sets URL's bus factor score to 100 if repository has 100 or more contributors
         # Otherwise, sets bus factor score to number of contributors
-        if numContributors >= 100:
+        if num_contributors >= 100:
             self.bus_factor = 1
         else:
-            self.bus_factor = numContributors / 100
+            self.bus_factor = num_contributors / 100
 
         return
 
@@ -138,11 +138,11 @@ class URL:
         header = {'Authorization': f'token {pat}'}
 
         # Formats URL to be in form 'https://api.github.com/repos/{owner}/{repo}/releases/latest'
-        formattedURL = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/releases/latest'
+        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/releases/latest'
 
         # Obtains value showing when repository was most recently updated as a datetime value, if possible
         # Otherwise, prints error message and exits 1
-        response = requests.get(formattedURL, headers=header)
+        response = requests.get(formatted_url, headers=header)
         try:
             last_updated_str = response.json()['published_at']
         except Exception:
@@ -188,7 +188,7 @@ class URL:
         readme_file = ''  # Filename of ReadMe
         for file in os.listdir('repo'):
             if 'readme' in file.lower():
-                logging.error('readme found in: ' + file)
+                logging.error('readme found in: %s', file)
 
                 readme_file = file
                 break
@@ -199,7 +199,7 @@ class URL:
             self.ramp_up = 0
             return
 
-        with open('repo/' + readme_file, 'r') as readme:
+        with open('repo/' + readme_file, 'r', encoding='UTF-8') as readme:
             content = readme.read()
 
         if ("installation guide" in content.lower()) or ("quickstart guide" in content.lower()):
@@ -208,7 +208,7 @@ class URL:
             self.ramp_up = 1
         else:
             if len(content) < 1000:
-                logging.error("Ramp Up score = " + str(len(content) / 1000) + " based on size of README")
+                logging.error("Ramp Up score = %s based on size of README", str(len(content) / 1000))
 
                 self.ramp_up = len(content) / 1000
             elif len(content) >= 1000:
@@ -249,10 +249,10 @@ class URL:
         state_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit + '/status'
         # print(stateURL)
 
-        r = requests.get(api_url, headers=header)
-        r2 = requests.get(state_url, headers=header)
-        content = r.json()
-        status = r2.json()
+        req = requests.get(api_url, headers=header)
+        req2 = requests.get(state_url, headers=header)
+        content = req.json()
+        status = req2.json()
         # print(content['commit']['verification']['verified'])
         try:
             status["state"]
@@ -294,7 +294,7 @@ class URL:
         readme_file = ''  # Filename of ReadMe
         for file in os.listdir('repo'):
             if 'readme' in file.lower():
-                logging.error('readme found in: ' + file)
+                logging.error('readme found in: %s', file)
 
                 readme_file = file
                 break
@@ -306,7 +306,7 @@ class URL:
             self.license = 0
             return
 
-        with open('repo/' + readme_file, 'r') as readme:
+        with open('repo/' + readme_file, 'r', encoding='UTF-8') as readme:
             content = readme.read()
 
         license_string = re.search('lgpl.{0,20}2.1', content.lower())
