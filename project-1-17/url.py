@@ -32,7 +32,7 @@ class URL:
     elif LOG_LEVEL == '2':
         log_level = logging.DEBUG
     else:
-        logging.error(f"Log level %s is not defined", LOG_LEVEL)
+        logging.error("Log level %s is not defined", LOG_LEVEL)
         sys.exit()
 
     logging.basicConfig(filename=log_file, level=LOG_LEVEL)
@@ -49,7 +49,7 @@ class URL:
         self.license = licen
 
     def convert_npm_to_github(self):
-        logging.info(f"Converting URL %s...", self.url)
+        logging.info("Converting URL %s...", self.url)
 
         html = requests.get(self.url).text
         # Searches for GitHub URL in the raw html
@@ -64,35 +64,35 @@ class URL:
         self.url = repo
 
     def set_owner(self):
-        logging.info(f"Getting owner for URL %s...", self.url)
+        logging.info("Getting owner for URL %s...", self.url)
 
         owner_string = re.search('.com/.*/', self.url)
         try:
             self.owner = owner_string.group()[5:-1]
         except Exception:
-            logging.error(f"Invalid URL '%s', skipping tests", self.url)
+            logging.error("Invalid URL '%s', skipping tests", self.url)
             self.owner = -1
 
     def set_repo(self):
-        logging.info(f"Getting repo for URL %s...", self.url)
+        logging.info("Getting repo for URL %s...", self.url)
 
         repoString = re.search(self.owner + '/.*', self.url)
         try:
             self.repo = repoString.group()[len(self.owner) + 1:]
         except Exception:
-            logging.error(f"Invalid URL '%s', skipping tests", self.url)
+            logging.error("Invalid URL '%s', skipping tests", self.url)
 
             self.repo = -1
 
     def get_bus_factor(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Setting bus factor URL %s...", self.url)
+            logging.info("Setting bus factor URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
-                logging.info(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
+                logging.info("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.bus_factor = -1
             return
@@ -108,7 +108,7 @@ class URL:
         try:
             numContributors = len(response.json()) + 1
         except Exception:
-            logging.error(f"Error getting bus factor score with URL '%s'", self.url)
+            logging.error("Error getting bus factor score with URL '%s'", self.url)
 
             self.bus_factor = -1
             return
@@ -124,13 +124,13 @@ class URL:
 
     def get_responsiveness(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting responsiveness for URL %s...", self.url)
+            logging.info("Getting responsiveness for URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
-                logging.error(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
+                logging.error("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.response = -1
             return
@@ -146,7 +146,7 @@ class URL:
         try:
             last_updated_str = response.json()['published_at']
         except Exception:
-            logging.error(f"Error getting responsiveness score, no release data with URL '%s'", self.url)
+            logging.error("Error getting responsiveness score, no release data with URL '%s'", self.url)
 
             self.response = 0
             return
@@ -168,7 +168,7 @@ class URL:
 
     def get_ramp_up(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting ramp-up for URL %s...", self.url)
+            logging.info("Getting ramp-up for URL %s...", self.url)
 
         if os.path.isdir("repo"):
             if int(os.getenv('LOG_LEVEL')) > 1:
@@ -180,7 +180,7 @@ class URL:
         Repo.clone_from(self.url, "repo")
 
         if not os.path.isdir("repo"):
-            logging.error(f"Unable to clone repository from '%s'", self.url)
+            logging.error("Unable to clone repository from '%s'", self.url)
 
             self.ramp_up = -1
             return
@@ -224,11 +224,11 @@ class URL:
         # REFERENCE: https://towardsdatascience.com/all-the-things-you-can-do-with-github-api-and-python-f01790fca131
 
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting correctness for URL %s...", self.url)
+            logging.info("Getting correctness for URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
-            logging.error(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
+            logging.error("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.correctness = -1
 
@@ -257,7 +257,7 @@ class URL:
         try:
             status["state"]
         except Exception:
-            logging.error(f"Error getting correctness score with URL '%s'", self.url)
+            logging.error("Error getting correctness score with URL '%s'", self.url)
 
             self.correctness = -1
             return
@@ -283,10 +283,10 @@ class URL:
 
     def get_license(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting license for URL %s...", self.url)
+            logging.info("Getting license for URL %s...", self.url)
 
         if not os.path.isdir("repo"):
-            logging.error(f"Unable to clone repository from '%s'", self.url)
+            logging.error("Unable to clone repository from '%s'", self.url)
 
             self.license = -1
             return
@@ -322,7 +322,7 @@ class URL:
 
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting net score for URL %s...", self.url)
+            logging.info("Getting net score for URL %s...", self.url)
 
         if self.ramp_up == -1 or self.correctness == -1 or self.bus_factor == -1 \
                 or self.response == -1 or self.license == -1:
