@@ -1,12 +1,11 @@
-import sys # Import sys for argv
 from sys import exit
 from url import URL # Import class data
-import shutil
-import pytest #DEPENDENCIES: pip install pytest
 import os
 
-urlArray = []
-def testLen():
+url_array = []
+
+
+def test_len():
     # Check for the right amount of URLs
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
@@ -14,37 +13,37 @@ def testLen():
         logFile.close()
     filename = 'test/testFile.txt'
     try:
-        file = open(filename, 'r')
-    except:
+        with open(filename, 'r') as file:
+            text = file.read()
+    except Exception:
         print("ERROR: Specified file '{}' not found!\nExiting...".format(filename))
         exit(1)
 
-    text = file.read()
     URLs = text.split()
-    #urlArray = []
 
     for urlIdx in URLs:
         # Check if URL needs to be converted
         urlData = URL()
         urlData.url = urlIdx
-        if('npmjs' in urlIdx):
-            urlData.convertNpmToGitHub()
-        
-        urlData.setOwner()
+        if 'npmjs' in urlIdx:
+            urlData.convert_npm_to_github()
+
+        urlData.set_owner()
         # Check for valid repo
-        if(urlData.owner == -1):
+        if urlData.owner == -1:
             urlData.netScore = -1
             continue
-        urlData.setRepo()
+        urlData.set_repo()
         # Check for valid repo
-        if(urlData.repo == -1):
+        if urlData.repo == -1:
             urlData.netScore = -1
             continue
 
-        urlArray.append(urlData)
-    assert len(urlArray) == 10
+        url_array.append(urlData)
+    assert len(url_array) == 10
 
-def testSort():
+
+def test_sort():
     # Make sure the URLs are sorted
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
@@ -61,94 +60,86 @@ def testSort():
     url3.netScore = 0.7
     url4.netScore = 0.92
     url5.netScore = 0.4
-    urlArray = [url1, url2, url3, url4, url5]
+    url_array = [url1, url2, url3, url4, url5]
 
-    sortedURLS = sorted(urlArray, key=(lambda getNet: getNet.netScore), reverse=True)
+    sortedURLS = sorted(url_array, key=(lambda getNet: getNet.netScore), reverse=True)
 
     idx = 0
     while idx < 4:
-        assert sortedURLS[idx].netScore >= sortedURLS[idx+1].netScore
+        assert sortedURLS[idx].netScore >= sortedURLS[idx + 1].netScore
         idx = idx + 1
 
-def rangeVar(netScore):
-    assert netScore == -1 or (netScore <= 1 and netScore >= 0)
 
-def testRange():
+def range_var(netScore):
+    assert netScore == -1 or (1 >= netScore >= 0)
+
+
+def test_range():
     # Check for values either -1 or within [0,1]
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
         print("Running testRange...", file=logFile)
         logFile.close()
-
-    file = open('test/testFile.txt')
-    text = file.read()
+    with open('test/testFile.txt') as file:
+        text = file.read()
     URLs = text.split()
-    urlArray = []
+    url_array = []
 
     for urlIdx in URLs:
         # Check if URL needs to be converted
         urlData = URL()
         urlData.url = urlIdx
-        if('npmjs' in urlIdx):
-            urlData.convertNpmToGitHub()
-    
-        urlData.setOwner()
+        if 'npmjs' in urlIdx:
+            urlData.convert_npm_to_github()
+
+        urlData.set_owner()
         # Check for valid repo
-        if(urlData.owner == -1):
+        if urlData.owner == -1:
             urlData.netScore = -1
             continue
-        urlData.setRepo()
+        urlData.set_repo()
         # Check for valid repo
-        if(urlData.repo == -1):
+        if urlData.repo == -1:
             urlData.netScore = -1
             continue
-        urlData.getBusFactor()
-        urlData.getResponsiveness()
-        urlData.getRampUp()
-        urlData.getCorrectness()
-        urlData.getLicense()
-        urlData.getNetScore()
-        urlArray.append(urlData)
+        urlData.get_bus_factor()
+        urlData.get_responsiveness()
+        urlData.get_ramp_up()
+        urlData.get_correctness()
+        urlData.get_license()
+        urlData.get_net_score()
+        url_array.append(urlData)
 
-    assert True # Completed acquisition of data successfully
+    assert True  # Completed acquisition of data successfully
 
-def testRangeNet():
-    for url in urlArray:
-        assert url.netScore == -1 or (url.netScore <= 1 and url.netScore >= 0)
 
-def testRangeRamp():
-    for url in urlArray:
-        assert url.rampUp == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+def test_range_net():
+    for url in url_array:
+        assert url.netScore == -1 or (1 >= url.netScore >= 0)
 
-def testRangeCorrect():
-    for url in urlArray:
-        assert url.correctness == -1 or (url.correctness <= 1 and url.correctness >= 0)
 
-def testRangeBus():
-    for url in urlArray:
-        assert url.busFactor == -1 or (url.busFactor <= 1 and url.busFactor >= 0)
+def test_range_ramp():
+    for url in url_array:
+        assert url.rampUp == -1 or (1 >= url.rampUp >= 0)
 
-def testRangeResponse():
-    for url in urlArray:
-        assert url.response == -1 or (url.response <= 1 and url.response >= 0)
 
-def testRangeLicense():
-    for url in urlArray:
-        assert url.license == -1 or (url.license <= 1 and url.license >= 0)
-            
-    #print("Successfully closing...")
+def test_range_correct():
+    for url in url_array:
+        assert url.correctness == -1 or (1 >= url.correctness >= 0)
 
-def testConvert():
+
+def test_convert():
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
         print("Running testConvert...", file=logFile)
         logFile.close()
     url = URL()
     url.url = 'https://www.npmjs.com/package/express'
-    url.convertNpmToGitHub()
+    url.convert_npm_to_github()
     assert url.url == 'https://github.com/expressjs/express'
 
-def testBadPAT():
+
+def test_bad_PAT():
     # Check for bad PAT handling
     prevPAT = os.getenv('GITHUB_TOKEN')
     os.environ['GITHUB_TOKEN'] = ''
@@ -157,64 +148,71 @@ def testBadPAT():
         print("Running testBadPAT...", file=logFile)
         logFile.close()
 
-    file = open('test/testFile.txt')
-    text = file.read()
+    with open('test/testFile.txt') as file:
+        text = file.read()
     URLs = text.split()
-    urlArray = []
+    url_array = []
 
     for urlIdx in URLs:
         # Check if URL needs to be converted
         urlData = URL()
         urlData.url = urlIdx
-        if('npmjs' in urlIdx):
-            urlData.convertNpmToGitHub()
-    
-        urlData.setOwner()
-        # Check for valid repo
-        if(urlData.owner == -1):
-            urlData.netScore = -1
-            continue
-        urlData.setRepo()
-        # Check for valid repo
-        if(urlData.repo == -1):
-            urlData.netScore = -1
-            continue
-        urlData.getBusFactor()
-        urlData.getResponsiveness()
-        urlData.getRampUp()
-        urlData.getCorrectness()
-        urlData.getLicense()
-        urlData.getNetScore()
-        urlArray.append(urlData)
+        if 'npmjs' in urlIdx:
+            urlData.convert_npm_to_github()
 
-    assert True # Code didn't break after bad PAT was given
-    os.environ['GITHUB_TOKEN'] = prevPAT # Restore original PAT
+        urlData.set_owner()
+        # Check for valid repo
+        if urlData.owner == -1:
+            urlData.netScore = -1
+            continue
+        urlData.set_repo()
+        # Check for valid repo
+        if urlData.repo == -1:
+            urlData.netScore = -1
+            continue
+        urlData.get_bus_factor()
+        urlData.get_responsiveness()
+        urlData.get_ramp_up()
+        urlData.get_correctness()
+        urlData.get_license()
+        urlData.get_net_score()
+        url_array.append(urlData)
+
+    assert True  # Code didn't break after bad PAT was given
+    os.environ['GITHUB_TOKEN'] = prevPAT  # Restore original PAT
+
 
 def testRangeNetBadPAT():
-    for url in urlArray:
-        assert url.netScore == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+    for url in url_array:
+        assert url.netScore == -1 or (1 >= url.rampUp >= 0)
+
 
 def testRangeRampBadPAT():
-    for url in urlArray:
-        assert url.rampUp == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+    for url in url_array:
+        assert url.rampUp == -1 or (1 >= url.rampUp >= 0)
+
 
 def testRangeCorrectBadPAT():
-    for url in urlArray:
-        assert url.correctness == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+    for url in url_array:
+        assert url.correctness == -1 or (1 >= url.rampUp >= 0)
+
 
 def testRangeBusBadPAT():
-    for url in urlArray:
-        assert url.busFactor == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+    for url in url_array:
+        assert url.busFactor == -1 or (1 >= url.rampUp >= 0)
+
 
 def testRangeResponseBadPAT():
-    for url in urlArray:
-        assert url.response == -1 or (url.rampUp <= 1 and url.rampUp >= 0)
+    for url in url_array:
+        assert url.response == -1 or (1 >= url.rampUp >= 0)
+
 
 def testRangeLicenseBadPAT():
-    for url in urlArray:
-        assert url.license == -1 or (url.license <= 1 and url.license >= 0)
+    for url in url_array:
+        assert url.license == -1 or (1 >= url.license >= 0)
 
-def testRampUpGuide():
+
+def test_ramp_up_guide():
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
         print("Running testRampUpGuide...", file=logFile)
@@ -222,10 +220,11 @@ def testRampUpGuide():
     # Test that program can find an installation guide
     url = URL()
     url.url = 'https://github.com/Purdue-ECESS/ecea-website-source-code'
-    url.getRampUp()
+    url.get_ramp_up()
     assert url.rampUp == 1
 
-def testRampUpNoReadMe():
+
+def test_ramp_up_no_read_me():
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
         print("Running testRampUpNoReadMe...", file=logFile)
@@ -233,10 +232,11 @@ def testRampUpNoReadMe():
     # Test that program can handle a lacking ReadMe
     url = URL()
     url.url = 'https://github.com/Purdue-ECESS/website'
-    url.getRampUp()
+    url.get_ramp_up()
     assert url.rampUp < 0.5
 
-def testCorrectnessCI():
+
+def test_correctness():
     if int(os.getenv('LOG_LEVEL')) > 0:
         logFile = open(os.getenv('LOG_FILE'), 'a')
         print("Running testCorrectnessCI...", file=logFile)
@@ -244,7 +244,7 @@ def testCorrectnessCI():
     # Test that program can handle locating CI build info
     url = URL()
     url.url = 'https://github.com/expressjs/express'
-    url.setOwner()
-    url.setRepo()
-    url.getCorrectness()
+    url.set_owner()
+    url.set_repo()
+    url.get_correctness()
     assert url.correctness == 1
