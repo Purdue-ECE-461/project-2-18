@@ -31,12 +31,12 @@ def test_len():
         urlData.set_owner()
         # Check for valid repo
         if urlData.owner == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
         urlData.set_repo()
         # Check for valid repo
         if urlData.repo == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
 
         url_array.append(urlData)
@@ -55,18 +55,18 @@ def test_sort():
     url4 = URL()
     url5 = URL()
 
-    url1.netScore = 0.2
-    url2.netScore = 0.85
-    url3.netScore = 0.7
-    url4.netScore = 0.92
-    url5.netScore = 0.4
+    url1.net_score = 0.2
+    url2.net_score = 0.85
+    url3.net_score = 0.7
+    url4.net_score = 0.92
+    url5.net_score = 0.4
     url_array = [url1, url2, url3, url4, url5]
 
-    sortedURLS = sorted(url_array, key=(lambda getNet: getNet.netScore), reverse=True)
+    sortedURLS = sorted(url_array, key=(lambda getNet: getNet.net_score), reverse=True)
 
     idx = 0
     while idx < 4:
-        assert sortedURLS[idx].netScore >= sortedURLS[idx + 1].netScore
+        assert sortedURLS[idx].net_score >= sortedURLS[idx + 1].net_score
         idx = idx + 1
 
 
@@ -95,12 +95,12 @@ def test_range():
         urlData.set_owner()
         # Check for valid repo
         if urlData.owner == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
         urlData.set_repo()
         # Check for valid repo
         if urlData.repo == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
         urlData.get_bus_factor()
         urlData.get_responsiveness()
@@ -115,12 +115,12 @@ def test_range():
 
 def test_range_net():
     for url in url_array:
-        assert url.netScore == -1 or (1 >= url.netScore >= 0)
+        assert url.net_score == -1 or (1 >= url.net_score >= 0)
 
 
 def test_range_ramp():
     for url in url_array:
-        assert url.rampUp == -1 or (1 >= url.rampUp >= 0)
+        assert url.ramp_up == -1 or (1 >= url.ramp_up >= 0)
 
 
 def test_range_correct():
@@ -163,12 +163,12 @@ def test_bad_PAT():
         urlData.set_owner()
         # Check for valid repo
         if urlData.owner == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
         urlData.set_repo()
         # Check for valid repo
         if urlData.repo == -1:
-            urlData.netScore = -1
+            urlData.net_score = -1
             continue
         urlData.get_bus_factor()
         urlData.get_responsiveness()
@@ -184,27 +184,27 @@ def test_bad_PAT():
 
 def testRangeNetBadPAT():
     for url in url_array:
-        assert url.netScore == -1 or (1 >= url.rampUp >= 0)
+        assert url.net_score == -1 or (1 >= url.ramp_up >= 0)
 
 
 def testRangeRampBadPAT():
     for url in url_array:
-        assert url.rampUp == -1 or (1 >= url.rampUp >= 0)
+        assert url.ramp_up == -1 or (1 >= url.ramp_up >= 0)
 
 
 def testRangeCorrectBadPAT():
     for url in url_array:
-        assert url.correctness == -1 or (1 >= url.rampUp >= 0)
+        assert url.correctness == -1 or (1 >= url.ramp_up >= 0)
 
 
 def testRangeBusBadPAT():
     for url in url_array:
-        assert url.busFactor == -1 or (1 >= url.rampUp >= 0)
+        assert url.bus_factor == -1 or (1 >= url.ramp_up >= 0)
 
 
 def testRangeResponseBadPAT():
     for url in url_array:
-        assert url.response == -1 or (1 >= url.rampUp >= 0)
+        assert url.response == -1 or (1 >= url.ramp_up >= 0)
 
 
 def testRangeLicenseBadPAT():
@@ -221,7 +221,7 @@ def test_ramp_up_guide():
     url = URL()
     url.url = 'https://github.com/Purdue-ECESS/ecea-website-source-code'
     url.get_ramp_up()
-    assert url.rampUp == 1
+    assert url.ramp_up == 1
 
 
 def test_ramp_up_no_read_me():
@@ -233,7 +233,7 @@ def test_ramp_up_no_read_me():
     url = URL()
     url.url = 'https://github.com/Purdue-ECESS/website'
     url.get_ramp_up()
-    assert url.rampUp < 0.5
+    assert url.ramp_up < 0.5
 
 
 def test_correctness():

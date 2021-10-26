@@ -41,7 +41,7 @@ if filename == "test":
     results = testLog.read()
 
     numPassed = re.search('\d* passed', results)
-    if not numPassed is None:
+    if numPassed is not None:
         if not numPassed[0][0:-7] == '':
             numPassed = int(numPassed[0][0:-7])
         else:
@@ -97,12 +97,12 @@ for urlIdx in URLs:
     urlData.set_owner()
     # Check for valid repo
     if urlData.owner == -1:
-        urlData.netScore = -1
+        urlData.net_score = -1
         continue
     urlData.set_repo()
     # Check for valid repo
     if urlData.repo == -1:
-        urlData.netScore = -1
+        urlData.net_score = -1
         continue
     urlData.get_bus_factor()
     urlData.get_responsiveness()
@@ -112,10 +112,10 @@ for urlIdx in URLs:
     urlData.get_net_score()
     urlArray.append(urlData)
 
-sortedURLS = sorted(urlArray, key=(lambda getNet: getNet.netScore), reverse=True)
+sortedURLS = sorted(urlArray, key=(lambda getNet: getNet.net_score), reverse=True)
 for url in sortedURLS:
-    print(url.url + ' ' + str(url.netScore) + ' ' + str(url.rampUp) + ' ' + str(url.correctness) + ' ' + str(
-        url.busFactor) +
+    print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
+        url.bus_factor) +
           ' ' + str(url.response) + ' ' + str(url.license))
 
 file.close()

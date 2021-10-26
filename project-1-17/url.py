@@ -4,86 +4,96 @@ from git import Repo  # pip install GitPython
 import shutil
 import os
 import re
+import logging
 
 
 class URL:
-    def __init__(self, url='', netScore=0, rampUp=0, correctness=0, busFactor=0, response=0, license=0):
+
+    # Get environment
+    try:
+        log_file = os.environ['LOG_FILE']
+    except KeyError:
+        logging.error("Couldn't find environment variable for 'LOG_FILE'")
+        exit()
+
+    try:
+        LOG_LEVEL = os.environ['LOG_LEVEL']
+    except KeyError:
+        logging.error("Couldn't find environment variable for 'LOG_LEVEL'")
+        exit()
+
+    # Initialize
+
+    if LOG_LEVEL == '0':
+        log_level = logging.NOTSET
+    elif LOG_LEVEL == '1':
+        log_level = logging.INFO
+    elif LOG_LEVEL == '2':
+        log_level = logging.DEBUG
+    else:
+        logging.error(f"Log level {LOG_LEVEL} is not defined")
+        exit()
+
+    logging.basicConfig(filename=log_file, level=LOG_LEVEL)
+
+    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0, bus_factor=0, response=0, licen=0):
         self.url = url
         self.owner = ''
         self.repo = ''
-        self.netScore = netScore
-        self.rampUp = rampUp
+        self.net_score = net_score
+        self.ramp_up = ramp_up
         self.correctness = correctness
-        self.busFactor = busFactor
+        self.bus_factor = bus_factor
         self.response = response
-        self.license = license
+        self.license = licen
 
     def convert_npm_to_github(self):
-        if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Converting URL {}...".format(self.url), file=logFile)
-            logFile.close()
+        logging.info(f"Converting URL {self.url}...")
 
         html = requests.get(self.url).text
         # Searches for GitHub URL in the raw html
-        gitHubUrl = re.search(r'("repository":".{0,100}","keywords")', html)
+        git_hub_url = re.search(r'("repository":".{0,100}","keywords")', html)
 
         # Check if repo was found
-        if gitHubUrl is None:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("ERROR: GitHub URL not found from NPM site", file=logFile)
-                logFile.close()
+        if git_hub_url is None:
+            logging.error("ERROR: GitHub URL not found from NPM site")
             return None
 
-        repo = gitHubUrl.group()[14:-12]
+        repo = git_hub_url.group()[14:-12]
         self.url = repo
 
     def set_owner(self):
-        if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting owner for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+        logging.info(f"Getting owner for URL {self.url}...")
 
         ownerString = re.search('.com/.*/', self.url)
         try:
             self.owner = ownerString.group()[5:-1]
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Invalid URL '{}', skipping tests".format(self.url), file=logFile)
-                logFile.close()
+            logging.error(f"Invalid URL '{self.url}', skipping tests")
             self.owner = -1
 
     def set_repo(self):
-        if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting repo for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+        logging.info(f"Getting repo for URL {self.url}...")
 
         repoString = re.search(self.owner + '/.*', self.url)
         try:
             self.repo = repoString.group()[len(self.owner) + 1:]
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Invalid URL '{}', skipping tests".format(self.url), file=logFile)
-                logFile.close()
+            logging.error(f"Invalid URL '{self.url}', skipping tests")
+
             self.repo = -1
 
     def get_bus_factor(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Setting bus factor URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Setting bus factor URL {self.url}...")
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("ERROR: Bad credentials, setting net score to -1 for {}...".format(self.url), file=logFile)
-                logFile.close()
-            self.busFactor = -1
+
+                logging.info(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+
+            self.bus_factor = -1
             return
 
         header = {'Authorization': f'token {pat}'}
@@ -97,34 +107,30 @@ class URL:
         try:
             numContributors = len(response.json()) + 1
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Error getting bus factor score with URL '{}'".format(self.url), file=logFile)
-                logFile.close()
-            self.busFactor = -1
+            logging.error(f"Error getting bus factor score with URL '{self.url}'")
+
+            self.bus_factor = -1
             return
 
         # Sets URL's bus factor score to 100 if repository has 100 or more contributors
         # Otherwise, sets bus factor score to number of contributors
         if numContributors >= 100:
-            self.busFactor = 1
+            self.bus_factor = 1
         else:
-            self.busFactor = numContributors / 100
+            self.bus_factor = numContributors / 100
 
         return
 
     def get_responsiveness(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting responsiveness for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Getting responsiveness for URL {self.url}...")
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("ERROR: Bad credentials, setting net score to -1 for {}...".format(self.url), file=logFile)
-                logFile.close()
+
+                logging.error(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+
             self.response = -1
             return
 
@@ -137,24 +143,21 @@ class URL:
         # Otherwise, prints error message and exits 1
         response = requests.get(formattedURL, headers=header)
         try:
-            lastUpdatedStr = response.json()['published_at']
+            last_updated_str = response.json()['published_at']
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Error getting responsiveness score, no release data with URL '{}'".format(self.url),
-                      file=logFile)
-                logFile.close()
+            logging.error(f"Error getting responsiveness score, no release data with URL '{self.url}'")
+
             self.response = 0
             return
-        lastUpdatedDT = dt.strptime(lastUpdatedStr, '%Y-%m-%dT%H:%M:%SZ')
+        last_updated_dt = dt.strptime(last_updated_str, '%Y-%m-%dT%H:%M:%SZ')
 
         # Calculates difference between current datetime and when repository was most recently updated
-        currentDT = dt.now()
-        timeDelta = currentDT - lastUpdatedDT
+        current_dt = dt.now()
+        time_delta = current_dt - last_updated_dt
 
         # Calculates responsiveness score
         # Score starts at 100 and decreases by 5 points for every 30 days it has not been updated, starting from day 30
-        responsiveness = 100 - (5 * (timeDelta.days // 30))
+        responsiveness = 100 - (5 * (time_delta.days // 30))
         if responsiveness >= 0:
             self.response = responsiveness / 100
         else:
@@ -164,89 +167,68 @@ class URL:
 
     def get_ramp_up(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting ramp-up for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Getting ramp-up for URL {self.url}...")
 
         if os.path.isdir("repo"):
             if int(os.getenv('LOG_LEVEL')) > 1:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print('Deleting exising repository folder...', file=logFile)
-                logFile.close()
+
+                logging.info('Deleting exising repository folder...')
+
             shutil.rmtree('repo', ignore_errors=True)
 
         Repo.clone_from(self.url, "repo")
 
         if not os.path.isdir("repo"):
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Unable to clone repository from '{}'".format(self.url), file=logFile)
-                logFile.close()
-            self.rampUp = -1
+            logging.error(f"Unable to clone repository from '{self.url}'")
+
+            self.ramp_up = -1
             return
 
-        readmeFile = ''  # Filename of ReadMe
+        readme_file = ''  # Filename of ReadMe
         for file in os.listdir('repo'):
             if 'readme' in file.lower():
-                if int(os.getenv('LOG_LEVEL')) == 2:
-                    logFile = open(os.getenv('LOG_FILE'), 'a')
-                    print('readme found in: ' + file, file=logFile)
-                    logFile.close()
-                readmeFile = file
+                logging.error('readme found in: ' + file)
+
+                readme_file = file
                 break
 
-        if readmeFile == '':
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Ramp Up score = 0, no README found", file=logFile)
-                logFile.close()
-            self.rampUp = 0
+        if readme_file == '':
+            logging.error("Ramp Up score = 0, no README found")
+
+            self.ramp_up = 0
             return
 
-        readme = open('repo/' + readmeFile, 'r')
-        content = readme.read()
+        with open('repo/' + readme_file, 'r') as readme:
+            content = readme.read()
 
         if ("installation guide" in content.lower()) or ("quickstart guide" in content.lower()):
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Ramp Up score = 100, Quickstart guide found", file=logFile)
-                logFile.close()
-            readme.close()
-            self.rampUp = 1
+            logging.error("Ramp Up score = 100, Quickstart guide found")
+
+            self.ramp_up = 1
         else:
             if len(content) < 1000:
-                if int(os.getenv('LOG_LEVEL')) == 2:
-                    logFile = open(os.getenv('LOG_FILE'), 'a')
-                    print("Ramp Up score = " + str(len(content) / 1000) + " based on size of README", file=logFile)
-                    logFile.close()
-                self.rampUp = len(content) / 1000
+                logging.error("Ramp Up score = " + str(len(content) / 1000) + " based on size of README")
+
+                self.ramp_up = len(content) / 1000
             elif len(content) >= 1000:
-                if int(os.getenv('LOG_LEVEL')) == 2:
-                    logFile = open(os.getenv('LOG_FILE'), 'a')
-                    print("Ramp Up score = 1 based on size of README", file=logFile)
-                    logFile.close()
-                self.rampUp = 1
+                logging.error("Ramp Up score = 1 based on size of README")
+
+                self.ramp_up = 1
             else:
-                if int(os.getenv('LOG_LEVEL')) == 2:
-                    logFile = open(os.getenv('LOG_FILE'), 'a')
-                    print("Ramp Up score = 0.25, README found but not Quickstart guide found", file=logFile)
-                    logFile.close()
-                self.rampUp = 0.25
+                logging.error("Ramp Up score = 0.25, README found but not Quickstart guide found")
+
+                self.ramp_up = 0.25
 
     def get_correctness(self):
         # REFERENCE: https://towardsdatascience.com/all-the-things-you-can-do-with-github-api-and-python-f01790fca131
 
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting correctness for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Getting correctness for URL {self.url}...")
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
-            if int(os.getenv('LOG_LEVEL')) > 0:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("ERROR: Bad credentials, setting net score to -1 for {}...".format(self.url), file=logFile)
-                logFile.close()
+            logging.error(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+
             self.correctness = -1
 
         header = {'Authorization': f'token {pat}'}
@@ -274,100 +256,76 @@ class URL:
         try:
             status["state"]
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Error getting correctness score with URL '{}'".format(self.url), file=logFile)
-                logFile.close()
+            logging.error(f"Error getting correctness score with URL '{self.url}'")
+
             self.correctness = -1
             return
 
         if status["state"] == 'success':
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Correctness score = 100, master commit build succeeding\nExiting...", file=logFile)
-                logFile.close()
+            logging.error("Correctness score = 100, master commit build succeeding\nExiting...")
+
             self.correctness = 1
 
         elif status['state'] == 'failure':
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Correctness score = 0, master commit build failing\nExiting...", file=logFile)
-                logFile.close()
+            logging.error("Correctness score = 0, master commit build failing\nExiting...")
+
             self.correctness = 0
 
         elif content['commit']['verification']['verified']:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Correctness score = 50, master commit verified, but no build info\nExiting...", file=logFile)
-                logFile.close()
+            logging.error("Correctness score = 50, master commit verified, but no build info\nExiting...")
+
             self.correctness = 0.5
         else:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Correctness score = 0, no build info and master commit not verified\nExiting...", file=logFile)
-                logFile.close()
+            logging.error("Correctness score = 0, no build info and master commit not verified\nExiting...")
+
             self.correctness = 0
 
     def get_license(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting license for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Getting license for URL {self.url}...")
 
         if not os.path.isdir("repo"):
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("Unable to clone repository from '{}'".format(self.url), file=logFile)
-                logFile.close()
+            logging.error(f"Unable to clone repository from '{self.url}'")
+
             self.license = -1
             return
 
         readmeFile = ''  # Filename of ReadMe
         for file in os.listdir('repo'):
             if 'readme' in file.lower():
-                if int(os.getenv('LOG_LEVEL')) == 2:
-                    logFile = open(os.getenv('LOG_FILE'), 'a')
-                    print('readme found in: ' + file, file=logFile)
-                    logFile.close()
+                logging.error('readme found in: ' + file)
+
                 readmeFile = file
                 break
 
         if readmeFile == '':
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("License score = 0, no README found", file=logFile)
-                logFile.close()
+            logging.error("License score = 0, no README found")
+
             shutil.rmtree('repo', ignore_errors=True)
             self.license = 0
             return
 
-        readme = open('repo/' + readmeFile, 'r')
-        content = readme.read()
+        with open('repo/' + readmeFile, 'r') as readme:
+            content = readme.read()
 
         licenseString = re.search('lgpl.{0,20}2.1', content.lower())
         try:
             _ = licenseString.group()
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("License score = 1, no matching license found", file=logFile)
-                logFile.close()
+            logging.error("License score = 1, no matching license found")
+
             self.license = 1
         except Exception:
-            if int(os.getenv('LOG_LEVEL')) == 2:
-                logFile = open(os.getenv('LOG_FILE'), 'a')
-                print("License score = 0, no matching license found", file=logFile)
-                logFile.close()
+            logging.error("License score = 0, no matching license found")
+
             self.license = 0
 
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logFile = open(os.getenv('LOG_FILE'), 'a')
-            print("Getting net score for URL {}...".format(self.url), file=logFile)
-            logFile.close()
+            logging.info(f"Getting net score for URL {self.url}...")
 
-        if self.rampUp == -1 or self.correctness == -1 or self.busFactor == -1 \
+        if self.ramp_up == -1 or self.correctness == -1 or self.bus_factor == -1 \
                 or self.response == -1 or self.license == -1:
-            self.netScore = -1
+            self.net_score = -1
             return
-        self.netScore = ((self.busFactor * 0.4) + (self.response * 0.3) + (
-                self.correctness + self.rampUp) * 0.15) * self.license
+        self.net_score = ((self.bus_factor * 0.4) + (self.response * 0.3) + (
+                self.correctness + self.ramp_up) * 0.15) * self.license
