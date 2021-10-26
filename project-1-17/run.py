@@ -1,5 +1,4 @@
 import sys  # Import sys for argv
-from sys import exit
 # from url import URL # Import class data
 import shutil
 # import pytest #DEPENDENCIES: pip install pytest

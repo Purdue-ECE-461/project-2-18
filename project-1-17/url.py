@@ -1,10 +1,11 @@
-import requests  # pip install PyGithub requests
 from datetime import datetime as dt  # pip install datetime
 from git import Repo  # pip install GitPython
 import shutil
 import os
 import re
 import logging
+import sys
+import requests  # pip install PyGithub requests
 
 
 class URL:
@@ -14,13 +15,13 @@ class URL:
         log_file = os.environ['LOG_FILE']
     except KeyError:
         logging.error("Couldn't find environment variable for 'LOG_FILE'")
-        exit()
+        sys.exit()
 
     try:
         LOG_LEVEL = os.environ['LOG_LEVEL']
     except KeyError:
         logging.error("Couldn't find environment variable for 'LOG_LEVEL'")
-        exit()
+        sys.exit()
 
     # Initialize
 
@@ -31,8 +32,8 @@ class URL:
     elif LOG_LEVEL == '2':
         log_level = logging.DEBUG
     else:
-        logging.error(f"Log level {LOG_LEVEL} is not defined")
-        exit()
+        logging.error(f"Log level %s is not defined", LOG_LEVEL)
+        sys.exit()
 
     logging.basicConfig(filename=log_file, level=LOG_LEVEL)
 
@@ -48,7 +49,7 @@ class URL:
         self.license = licen
 
     def convert_npm_to_github(self):
-        logging.info(f"Converting URL {self.url}...")
+        logging.info(f"Converting URL %s...", self.url)
 
         html = requests.get(self.url).text
         # Searches for GitHub URL in the raw html
@@ -63,35 +64,35 @@ class URL:
         self.url = repo
 
     def set_owner(self):
-        logging.info(f"Getting owner for URL {self.url}...")
+        logging.info(f"Getting owner for URL %s...", self.url)
 
-        ownerString = re.search('.com/.*/', self.url)
+        owner_string = re.search('.com/.*/', self.url)
         try:
-            self.owner = ownerString.group()[5:-1]
+            self.owner = owner_string.group()[5:-1]
         except Exception:
-            logging.error(f"Invalid URL '{self.url}', skipping tests")
+            logging.error(f"Invalid URL '%s', skipping tests", self.url)
             self.owner = -1
 
     def set_repo(self):
-        logging.info(f"Getting repo for URL {self.url}...")
+        logging.info(f"Getting repo for URL %s...", self.url)
 
         repoString = re.search(self.owner + '/.*', self.url)
         try:
             self.repo = repoString.group()[len(self.owner) + 1:]
         except Exception:
-            logging.error(f"Invalid URL '{self.url}', skipping tests")
+            logging.error(f"Invalid URL '%s', skipping tests", self.url)
 
             self.repo = -1
 
     def get_bus_factor(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Setting bus factor URL {self.url}...")
+            logging.info(f"Setting bus factor URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
-                logging.info(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+                logging.info(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.bus_factor = -1
             return
@@ -107,7 +108,7 @@ class URL:
         try:
             numContributors = len(response.json()) + 1
         except Exception:
-            logging.error(f"Error getting bus factor score with URL '{self.url}'")
+            logging.error(f"Error getting bus factor score with URL '%s'", self.url)
 
             self.bus_factor = -1
             return
@@ -123,13 +124,13 @@ class URL:
 
     def get_responsiveness(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting responsiveness for URL {self.url}...")
+            logging.info(f"Getting responsiveness for URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
-                logging.error(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+                logging.error(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.response = -1
             return
@@ -145,7 +146,7 @@ class URL:
         try:
             last_updated_str = response.json()['published_at']
         except Exception:
-            logging.error(f"Error getting responsiveness score, no release data with URL '{self.url}'")
+            logging.error(f"Error getting responsiveness score, no release data with URL '%s'", self.url)
 
             self.response = 0
             return
@@ -167,7 +168,7 @@ class URL:
 
     def get_ramp_up(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting ramp-up for URL {self.url}...")
+            logging.info(f"Getting ramp-up for URL %s...", self.url)
 
         if os.path.isdir("repo"):
             if int(os.getenv('LOG_LEVEL')) > 1:
@@ -179,7 +180,7 @@ class URL:
         Repo.clone_from(self.url, "repo")
 
         if not os.path.isdir("repo"):
-            logging.error(f"Unable to clone repository from '{self.url}'")
+            logging.error(f"Unable to clone repository from '%s'", self.url)
 
             self.ramp_up = -1
             return
@@ -223,40 +224,40 @@ class URL:
         # REFERENCE: https://towardsdatascience.com/all-the-things-you-can-do-with-github-api-and-python-f01790fca131
 
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting correctness for URL {self.url}...")
+            logging.info(f"Getting correctness for URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
-            logging.error(f"ERROR: Bad credentials, setting net score to -1 for {self.url}...")
+            logging.error(f"ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.correctness = -1
 
         header = {'Authorization': f'token {pat}'}
 
         # Formats URL to be in form 'https://api.github.com/repos/{owner}/{repo}/releases/latest'
-        commitUrl = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/releases/latest'
-        commitData = requests.get(commitUrl, headers=header)
-        commitData = commitData.json()
+        commit_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/releases/latest'
+        commit_data = requests.get(commit_url, headers=header)
+        commit_data = commit_data.json()
 
         # If there is an error acquiring the data, return a score of -1 and continue through program
         try:
-            commit = commitData["target_commitish"]
+            commit = commit_data["target_commitish"]
         except Exception:
             commit = 'master'
 
-        apiURL = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit
-        stateURL = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit + '/status'
+        api_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit
+        state_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit + '/status'
         # print(stateURL)
 
-        r = requests.get(apiURL, headers=header)
-        r2 = requests.get(stateURL, headers=header)
+        r = requests.get(api_url, headers=header)
+        r2 = requests.get(state_url, headers=header)
         content = r.json()
         status = r2.json()
         # print(content['commit']['verification']['verified'])
         try:
             status["state"]
         except Exception:
-            logging.error(f"Error getting correctness score with URL '{self.url}'")
+            logging.error(f"Error getting correctness score with URL '%s'", self.url)
 
             self.correctness = -1
             return
@@ -282,35 +283,35 @@ class URL:
 
     def get_license(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting license for URL {self.url}...")
+            logging.info(f"Getting license for URL %s...", self.url)
 
         if not os.path.isdir("repo"):
-            logging.error(f"Unable to clone repository from '{self.url}'")
+            logging.error(f"Unable to clone repository from '%s'", self.url)
 
             self.license = -1
             return
 
-        readmeFile = ''  # Filename of ReadMe
+        readme_file = ''  # Filename of ReadMe
         for file in os.listdir('repo'):
             if 'readme' in file.lower():
                 logging.error('readme found in: ' + file)
 
-                readmeFile = file
+                readme_file = file
                 break
 
-        if readmeFile == '':
+        if readme_file == '':
             logging.error("License score = 0, no README found")
 
             shutil.rmtree('repo', ignore_errors=True)
             self.license = 0
             return
 
-        with open('repo/' + readmeFile, 'r') as readme:
+        with open('repo/' + readme_file, 'r') as readme:
             content = readme.read()
 
-        licenseString = re.search('lgpl.{0,20}2.1', content.lower())
+        license_string = re.search('lgpl.{0,20}2.1', content.lower())
         try:
-            _ = licenseString.group()
+            _ = license_string.group()
             logging.error("License score = 1, no matching license found")
 
             self.license = 1
@@ -321,7 +322,7 @@ class URL:
 
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info(f"Getting net score for URL {self.url}...")
+            logging.info(f"Getting net score for URL %s...", self.url)
 
         if self.ramp_up == -1 or self.correctness == -1 or self.bus_factor == -1 \
                 or self.response == -1 or self.license == -1:
