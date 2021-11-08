@@ -1,13 +1,34 @@
-from google.cloud import firestore
-import url.py
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
+import url
+
+def read(db):
+    users_ref = db.collection(u'users')
+    docs = users_ref.stream()
+
+    for doc in docs:
+        print(f'{doc.id} => {doc.to_dict()}')
+
+def post(Url: url, db):
+    doc_ref = db.collection(u'URLS').document(Url.url)
+    doc_ref.set({
+        u'first': u'Ada',
+        u'last': u'Lovelace',
+        u'born': 1815
+    })
 #store in documents, search through documents
-def add_to_dict(url):
-    db = firestore.Client(url);
 
-    db.Collection(u'repositories').document(u'URLS').set(url)
+def main():
+    cred = credentials.ApplicationDefault()
+    firebase_admin.initialize_app(cred, {
+        'projectId': "project-group18",
+    })
+
+    db = firestore.client()
+    
 
 
-def get_from_dict():
-    #get info from dictionary
-
+if __name__ == "__main__":
+    main()
