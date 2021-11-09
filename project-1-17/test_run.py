@@ -3,6 +3,10 @@ import logging
 import os
 from url import URL  # Import class data
 
+os.environ['LOG_FILE'] = 'ranking.log'
+os.environ['LOG_LEVEL'] = '1'
+os.environ['GITHUB_TOKEN'] = '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'
+
 # Configure logging
 try:
     log_file = os.environ['LOG_FILE']

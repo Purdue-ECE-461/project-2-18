@@ -1,7 +1,8 @@
-project-1-17/.idea
 .idea
 .vscode
 .DS_Store
 *.pyc
-
+*.log
+*.json
 node_modules
+project-1-17/original_url.py

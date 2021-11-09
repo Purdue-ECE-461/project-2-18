@@ -5,6 +5,8 @@ import shutil
 import os
 import re
 import logging
+import json
+from time import time
 
 if len(sys.argv) != 2:
     print("\ncorrect format: ./python run.py <some-filename>.txt\n")
@@ -15,7 +17,12 @@ FILE_NAME = sys.argv[1]
 if FILE_NAME == "install":
     sys.exit(0)
 
+
 from url import URL  # Import class data after dependencies are installed
+
+os.environ['LOG_FILE'] = 'ranking.log'
+os.environ['LOG_LEVEL'] = '1'
+os.environ['GITHUB_TOKEN'] = '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'
 
 url_data = URL()
 url_array = []
@@ -45,7 +52,7 @@ else:
     logging.error("Log level %s is not defined", LOG_LEVEL)
     sys.exit()
 
-logging.basicConfig(filename=log_file, level=LOG_LEVEL)
+logging.basicConfig(filename=log_file, level=LOGGING_LEVEL)
 
 
 if FILE_NAME == "test":
@@ -94,6 +101,9 @@ if FILE_NAME == "test":
     shutil.rmtree('repo', ignore_errors=True)
     sys.exit(0)
 
+
+start_time = time()
+
 # Check for valid filename
 try:
     with open(FILE_NAME, 'r', encoding='UTF-8') as file:
@@ -131,14 +141,21 @@ for url_idx in URLs:
     url_data.get_net_score()
     url_array.append(url_data)
 
-sorted_urls = sorted(url_array, key=(lambda getNet: getNet.net_score), reverse=True)
+sorted_urls = sorted(url_array, key=(lambda get_net: get_net.net_score), reverse=True)
+url_data =[]
 for url in sorted_urls:
     print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
         url.bus_factor) +
           ' ' + str(url.response) + ' ' + str(url.license))
+    url_data.append(url.make_dict())
 
-file.close()
+
+full_dict = {'urls': url_data}
+with open('modules.json', 'w') as file:
+    json.dump(full_dict, file, indent="")
+
 shutil.rmtree('repo', ignore_errors=True)
 logging.info("Successfully closing...")
+print(f"Runtime: {int(time() - start_time)} sec")
 
 sys.exit(0)

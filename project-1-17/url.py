@@ -4,12 +4,16 @@ import re
 import logging
 import sys
 from datetime import datetime as dt  # pip install datetime
+from github import Github, GithubException
 from git import Repo  # pip install GitPython
 import requests  # pip install PyGithub requests
 
 
 class URL:
 
+    os.environ['LOG_FILE'] = 'ranking.log'
+    os.environ['LOG_LEVEL'] = '1'
+    os.environ['GITHUB_TOKEN'] = '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'
     # Get environment
     try:
         log_file = os.environ['LOG_FILE']
@@ -35,9 +39,9 @@ class URL:
         logging.error("Log level %s is not defined", LOG_LEVEL)
         sys.exit()
 
-    logging.basicConfig(filename=log_file, level=LOG_LEVEL)
+    logging.basicConfig(filename=log_file, level=log_level)
 
-    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0, bus_factor=0, response=0, licen=0):
+    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0, bus_factor=0, response=0, license=0):
         self.url = url
         self.owner = ''
         self.repo = ''
@@ -46,7 +50,7 @@ class URL:
         self.correctness = correctness
         self.bus_factor = bus_factor
         self.response = response
-        self.license = licen
+        self.license = license
 
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
@@ -86,7 +90,7 @@ class URL:
 
     def get_bus_factor(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info("Setting bus factor URL %s...", self.url)
+            logging.info("Getting bus factor URL %s...", self.url)
 
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
@@ -282,42 +286,18 @@ class URL:
             self.correctness = 0
 
     def get_license(self):
-        if int(os.getenv('LOG_LEVEL')) > 0:
-            logging.info("Getting license for URL %s...", self.url)
 
-        if not os.path.isdir("repo"):
-            logging.error("Unable to clone repository from '%s'", self.url)
+        g = Github(login_or_token=os.environ['GITHUB_TOKEN'])
+        repo = g.get_repo(self.url[19:])
+        logging.info("Getting license for URL %s...", self.url)
 
-            self.license = -1
-            return
-
-        readme_file = ''  # Filename of ReadMe
-        for file in os.listdir('repo'):
-            if 'readme' in file.lower():
-                logging.error('readme found in: %s', file)
-
-                readme_file = file
-                break
-
-        if readme_file == '':
-            logging.error("License score = 0, no README found")
-
-            shutil.rmtree('repo', ignore_errors=True)
-            self.license = 0
-            return
-
-        with open('repo/' + readme_file, 'r', encoding='UTF-8') as readme:
-            content = readme.read()
-
-        license_string = re.search('lgpl.{0,20}2.1', content.lower())
         try:
-            _ = license_string.group()
-            logging.error("License score = 1, no matching license found")
-
+            info = repo.get_license().decoded_content.decode().lower()
+        except GithubException:
+            info = repo.get_readme().decoded_content.decode().lower()
+        if "mit license" in info or 'general public license' in info:
             self.license = 1
-        except Exception:
-            logging.error("License score = 0, no matching license found")
-
+        else:
             self.license = 0
 
     def get_net_score(self):
@@ -328,5 +308,10 @@ class URL:
                 or self.response == -1 or self.license == -1:
             self.net_score = -1
             return
-        self.net_score = ((self.bus_factor * 0.4) + (self.response * 0.3) + (
-                self.correctness + self.ramp_up) * 0.15) * self.license
+        self.net_score = (((self.bus_factor * 0.4) + (self.response * 0.3) + (
+                self.correctness + self.ramp_up) * 0.15) * self.license).__round__(2)
+
+    def make_dict(self):
+        return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
+               'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
+               'response': self.response, 'license': self.license}
