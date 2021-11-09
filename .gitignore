@@ -3,3 +3,5 @@ project-1-17/.idea
 .vscode
 .DS_Store
 *.pyc
+
+node_modules

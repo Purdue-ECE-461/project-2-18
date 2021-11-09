@@ -5,19 +5,20 @@ from firebase_admin import firestore
 import url
 
 def read(db):
-    users_ref = db.collection(u'users')
+    users_ref = db.collection(u'URLS')
     docs = users_ref.stream()
 
     for doc in docs:
         print(f'{doc.id} => {doc.to_dict()}')
 
-def post(Url: url, db):
-    doc_ref = db.collection(u'URLS').document(Url.url)
+def post(db):
+    doc_ref = db.collection(u'URLS').document(u'test')
     doc_ref.set({
         u'first': u'Ada',
         u'last': u'Lovelace',
         u'born': 1815
     })
+    print("new url added")
 #store in documents, search through documents
 
 def main():
@@ -27,8 +28,8 @@ def main():
     })
 
     db = firestore.client()
-    
-
+    post(db)
+    read(db)
 
 if __name__ == "__main__":
     main()
