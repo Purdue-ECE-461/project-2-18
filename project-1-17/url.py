@@ -3,17 +3,14 @@ import os
 import re
 import logging
 import sys
+import requests
 from datetime import datetime as dt  # pip install datetime
 from github import Github, GithubException
 from git import Repo  # pip install GitPython
-import requests  # pip install PyGithub requests
 
 
 class URL:
 
-    os.environ['LOG_FILE'] = 'ranking.log'
-    os.environ['LOG_LEVEL'] = '1'
-    os.environ['GITHUB_TOKEN'] = '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'
     # Get environment
     try:
         log_file = os.environ['LOG_FILE']
@@ -55,7 +52,7 @@ class URL:
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
 
-        html = requests.get(self.url).text
+        html = requests.get(self.url, timeout=0.1).text
         # Searches for GitHub URL in the raw html
         git_hub_url = re.search(r'("repository":".{0,100}","keywords")', html)
 
@@ -292,10 +289,11 @@ class URL:
         logging.info("Getting license for URL %s...", self.url)
 
         try:
-            info = repo.get_license().decoded_content.decode().lower()
+            license_info = repo.get_license().license.name.lower()
         except GithubException:
-            info = repo.get_readme().decoded_content.decode().lower()
-        if "mit license" in info or 'general public license' in info:
+            license_info = repo.get_readme().decoded_content.decode().lower()
+
+        if any(['mit', 'general public license' in license_info]):
             self.license = 1
         else:
             self.license = 0
