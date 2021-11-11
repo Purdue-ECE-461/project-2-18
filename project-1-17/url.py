@@ -3,8 +3,8 @@ import os
 import re
 import logging
 import sys
-import requests
 from datetime import datetime as dt  # pip install datetime
+import requests
 from github import Github, GithubException
 from git import Repo  # pip install GitPython
 
@@ -38,7 +38,8 @@ class URL:
 
     logging.basicConfig(filename=log_file, level=log_level)
 
-    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0, bus_factor=0, response=0, license=0):
+    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0,
+                 bus_factor=0, response=0, valid_license=0):
         self.url = url
         self.owner = ''
         self.repo = ''
@@ -47,7 +48,7 @@ class URL:
         self.correctness = correctness
         self.bus_factor = bus_factor
         self.response = response
-        self.license = license
+        self.license = valid_license
 
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
@@ -100,8 +101,9 @@ class URL:
 
         header = {'Authorization': f'token {pat}'}
 
-        # Formats URL to be in form 'https://api.github.com/repos/{owner}/{repo}/contributors'
-        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/contributors'
+        # Formats URL to 'https://api.github.com/repos/{owner}/{repo}/contributors'
+        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo\
+                        + '/contributors'
 
         # Obtains list of up to 100 contributors for specified repository, if possible
         # Otherwise, prints error message and exits 1
@@ -138,8 +140,9 @@ class URL:
 
         header = {'Authorization': f'token {pat}'}
 
-        # Formats URL to be in form 'https://api.github.com/repos/{owner}/{repo}/releases/latest'
-        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/releases/latest'
+        # Formats URL to 'https://api.github.com/repos/{owner}/{repo}/releases/latest'
+        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo\
+                        + '/releases/latest'
 
         # Obtains value showing when repository was most recently updated as a datetime value, if possible
         # Otherwise, prints error message and exits 1
@@ -284,8 +287,8 @@ class URL:
 
     def get_license(self):
 
-        g = Github(login_or_token=os.environ['GITHUB_TOKEN'])
-        repo = g.get_repo(self.url[19:])
+        git = Github(login_or_token=os.environ['GITHUB_TOKEN'])
+        repo = git.get_repo(self.url[19:])
         logging.info("Getting license for URL %s...", self.url)
 
         try:
@@ -307,9 +310,9 @@ class URL:
             self.net_score = -1
             return
         self.net_score = (((self.bus_factor * 0.4) + (self.response * 0.3) + (
-                self.correctness + self.ramp_up) * 0.15) * self.license).__round__(2)
+            self.correctness + self.ramp_up) * 0.15) * self.license).__round__(2)
 
     def make_dict(self):
         return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
-               'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
-               'response': self.response, 'license': self.license}
+                'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
+                'response': self.response, 'license': self.license}
