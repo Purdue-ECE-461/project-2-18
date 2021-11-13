@@ -7,6 +7,7 @@ from datetime import datetime as dt  # pip install datetime
 import requests
 from github import Github, GithubException
 from git import Repo  # pip install GitPython
+from repo_store import RepoStore
 
 
 class URL:
@@ -39,7 +40,7 @@ class URL:
     logging.basicConfig(filename=log_file, level=log_level)
 
     def __init__(self, url='', net_score=0, ramp_up=0, correctness=0,
-                 bus_factor=0, response=0, valid_license=0):
+                 bus_factor=0, response=0, valid_license=0, dependency=0):
         self.url = url
         self.owner = ''
         self.repo = ''
@@ -49,6 +50,7 @@ class URL:
         self.bus_factor = bus_factor
         self.response = response
         self.license = valid_license
+        self.dependency = dependency
 
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
@@ -301,18 +303,34 @@ class URL:
         else:
             self.license = 0
 
+    def get_dependecy_score(self):
+        repo_store = RepoStore(self.url, f'./modules/{self.repo}')
+        repo_store.clone_repo()
+        dependencies = repo_store.get_dependencies()
+        if len(dependencies) == 0:
+            self.dependency = 1
+            return
+
+        # TODO
+        total_deps = len(dependencies)
+        specific_deps = 0
+
+        for version in dependencies.values():
+            pass
+        self.dependency = 100
+
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
             logging.info("Getting net score for URL %s...", self.url)
 
         if self.ramp_up == -1 or self.correctness == -1 or self.bus_factor == -1 \
-                or self.response == -1 or self.license == -1:
+                or self.response == -1 or self.license == -1 or self.dependency == -1:
             self.net_score = -1
             return
-        self.net_score = (((self.bus_factor * 0.4) + (self.response * 0.3) + (
-            self.correctness + self.ramp_up) * 0.15) * self.license).__round__(2)
+        self.net_score = ((0.3 * self.bus_factor + 0.3 * self.response + 0.15 *
+                           (self.correctness + self.ramp_up) + 0.1 * self.dependency) * self.license).__round__(2)
 
     def make_dict(self):
         return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
                 'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
-                'response': self.response, 'license': self.license}
+                'response': self.response, 'dependency': self.dependency, 'license': self.license}

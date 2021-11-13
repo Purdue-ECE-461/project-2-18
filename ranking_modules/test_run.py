@@ -34,7 +34,7 @@ url_array = []
 
 
 def get_urls():
-    file_name = 'test/testFile.txt'
+    file_name = 'tests/testFile.txt'
     try:
         with open(file_name, 'r', encoding='UTF-8') as file:
             text = file.read()

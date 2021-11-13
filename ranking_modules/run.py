@@ -51,18 +51,18 @@ else:
 logging.basicConfig(filename=log_file, level=LOGGING_LEVEL)
 
 
-if FILE_NAME == "test":
+if FILE_NAME == "tests":
     if os.path.isdir("repo"):
         logging.info('Deleting exising repository folder...')
         shutil.rmtree('repo', ignore_errors=True)
     prevLogLevel = os.getenv('LOG_LEVEL')
     os.environ['LOG_LEVEL'] = '2'  # Set highest log level for best coverage/testing of log capabilities
-    logging.info("running test package...")
+    logging.info("running tests package...")
 
-    FILE_NAME = 'test/testFile.txt'
-    os.system("coverage run -m pytest test_run.py > test/log.txt")
-    os.system("coverage report >> test/log.txt")
-    with open('test/log.txt', 'r', encoding='UTF-8') as testLog:
+    FILE_NAME = 'tests/testFile.txt'
+    os.system("coverage run -m pytest test_run.py > tests/log.txt")
+    os.system("coverage report >> tests/log.txt")
+    with open('tests/log.txt', 'r', encoding='UTF-8') as testLog:
         results = testLog.read()
 
     num_passed = re.search('\d* passed', results)
@@ -90,7 +90,7 @@ if FILE_NAME == "test":
     print(f'Passed: {num_passed}')
     print(f'Failed: {num_failed}')
     print(f'Coverage: {coverage}')
-    print(f'{num_passed}/{total} test cases passed. {coverage} line coverage achieved.')
+    print(f'{num_passed}/{total} tests cases passed. {coverage} line coverage achieved.')
 
     logging.info("\nTests completed, exiting...")
     os.environ['LOG_LEVEL'] = prevLogLevel  # Return to original log level
@@ -110,7 +110,8 @@ except Exception:
 
 URLs = text.split()
 
-print('URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE')
+print('URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE '
+      'RESPONSIVE_MAINTAINER_SCORE DEPENDENCY_SCORE LICENSE_SCORE')
 
 for url_idx in URLs:
     # Check if URL needs to be converted
@@ -134,6 +135,7 @@ for url_idx in URLs:
     url_data.get_ramp_up()
     url_data.get_correctness()
     url_data.get_license()
+    url_data.get_dependecy_score()
     url_data.get_net_score()
     url_array.append(url_data)
 
@@ -142,7 +144,7 @@ url_data =[]
 for url in sorted_urls:
     print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
         url.bus_factor) +
-          ' ' + str(url.response) + ' ' + str(url.license))
+          ' ' + str(url.response) + ' ' + str(url.dependency) + ' ' + str(url.license))
     url_data.append(url.make_dict())
 
 

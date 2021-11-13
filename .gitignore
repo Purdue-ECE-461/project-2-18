@@ -1,5 +1,6 @@
 .idea
 .vscode
+ranking_modules/modules
 .DS_Store
 *.pyc
 *.log
