@@ -65,6 +65,18 @@ class addJsonFirestore {
 
     }
 
+    async listall(){
+        const current = await this.db.collection(this.collection).get()
+        return current.docs.map(doc = doc.data());
+    }
+    
+    update(item){
+        console.log('updating item ${item.id}');
+        return this.db.collection(this.collection).update(Object.assign({}, item))
+        .then(() => true)
+        .catch((e) => console.error(e.message));
+    }
+
     exit(code){
         return process.exit(code);
     }
