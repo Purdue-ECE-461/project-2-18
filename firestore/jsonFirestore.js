@@ -48,13 +48,13 @@ class addJsonFirestore {
             console.error('type error:', this.type);
             this.exit(1);
         }
-       // console.log("db:", this.db);
+        console.log("db:", this.db);
         console.log("absolute path:", this.absolutePath);
         console.log("collection name:", this.collection);
         console.log("type: ", this.type);
     }
 
-    populate(){
+    async populate(){
         let data = [];
         try{
             data = (JSON.parse(fs.readFileSync(this.absolutePath, {}), 'utf8'));
@@ -67,11 +67,10 @@ class addJsonFirestore {
         }
         var i = 0;
         data.forEach(item => {
-           // console.log(item)
+            
             try{
                 if(this.type == 'add'){
-                    const coll = collection(db, "repositories");
-                  //  this.add(item);
+                    this.add(item);
                 }else if(this.type == 'update'){
                     this.update(item);
                 }
@@ -81,33 +80,53 @@ class addJsonFirestore {
             }
             if(i == data.length - 1){
                 console.log('UPLOAD SUCCESS');
-                this.exit(0);
             }  
             i++;          
         });
-        this.listall();
     }
 
-    async add(){
-        try {
-            const docRef = await addDoc(collection(db, "repositories"), {
-              first: "Alan",
-              middle: "Mathison",
-              last: "Turing",
-              born: 1912
-            });
-          
+    add(item){
+        console.log(item)
+        db.collection("repositories").add(item)
+        .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
-          } catch (e) {
-            console.error("Error adding document: ", e);
-          }
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+        });
     }
 
-    async listall(){
-        const repos = collection(db, 'repositories');
-        const repoSnapshot = await getDocs(repos);
-        const repoList = repoSnapshot.docs.map(doc => doc.data());
-        return repoList;
+    delete(item){
+        db.collection("repositories").delete(item)
+        .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+        });
+    }
+
+    get(item){
+        var docRef = db.collection("repositories").doc(item);
+        docRef.get().then((doc) => {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
+    }
+
+    listall(){
+        db.collection("repositories").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
+        });
     }
 
     update(item){
@@ -123,4 +142,5 @@ class addJsonFirestore {
 }
 
 const populateFirestore = new addJsonFirestore();
-populateFirestore.listall();
+populateFirestore.populate();
+//populateFirestore.listall();
