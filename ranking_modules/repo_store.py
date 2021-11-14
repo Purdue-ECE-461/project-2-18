@@ -4,8 +4,8 @@ import json
 
 class RepoStore:
 
-    def __init__(self, link: str, dir_location: str):
-        self.link = link
+    def __init__(self, url: str, dir_location: str):
+        self.link = url
         self.dir_location = dir_location
         self.package_location = dir_location + '/package.json'
 
