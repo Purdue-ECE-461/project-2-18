@@ -150,7 +150,7 @@ for url in sorted_urls:
 
 full_dict = {'urls': url_data}
 with open('modules.json', 'w') as file:
-    json.dump(full_dict, file, indent="")
+    json.dump(url_data, file, indent="")
 
 shutil.rmtree('repo', ignore_errors=True)
 logging.info("Successfully closing...")

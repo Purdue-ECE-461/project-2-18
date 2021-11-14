@@ -50,26 +50,21 @@ class addJsonFirestore {
 
     async populate(){
         let data = [];
+
         try{
             data = (JSON.parse(fs.readFileSync(this.absolutePath, {}), 'utf8'));
         } catch(e){
             console.error(e.message);
         }
-
+        console.log(data);
         if(data.length < 1){
             console.error('make sure JSON file has data');
+            this.exit(1);
         }
         var i = 0;
         data.forEach(item => {
             try{
-                if(this.type == 'add'){
-                    this.add(item);
-                }else if(this.type == 'update'){
-                    this.update(item);
-                }else if(this.type == 'get'){
-                    this.get(item);
-                }
-
+                this.add(item);
             }catch(e){
                 console.error(e.message);
             }
@@ -81,7 +76,7 @@ class addJsonFirestore {
     }
 
     add(item){
-        var name = item.id
+        var name = item.repo
         var str = name.toString();
         db.collection("repositories").doc(str).set(item)
         .then((docRef) => {
