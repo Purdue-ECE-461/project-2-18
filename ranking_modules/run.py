@@ -104,7 +104,7 @@ start_time = time()
 try:
     with open(FILE_NAME, 'r', encoding='UTF-8') as file:
         text = file.read()
-except Exception:
+except FileNotFoundError:
     logging.error("ERROR: Specified file '%s' not found!\nExiting...", FILE_NAME)
     sys.exit(1)
 
@@ -140,7 +140,7 @@ for url_idx in URLs:
     url_array.append(url_data)
 
 sorted_urls = sorted(url_array, key=(lambda get_net: get_net.net_score), reverse=True)
-url_data =[]
+url_data = []
 for url in sorted_urls:
     print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
         url.bus_factor) +
@@ -148,7 +148,6 @@ for url in sorted_urls:
     url_data.append(url.make_dict())
 
 
-full_dict = {'urls': url_data}
 with open('modules.json', 'w') as file:
     json.dump(url_data, file, indent="")
 
