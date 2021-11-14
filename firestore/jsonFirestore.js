@@ -30,12 +30,14 @@ class addJsonFirestore {
     constructor() {
         
         this.db = db; //admin database access
-        const [, , filepath, type] = process.argv;
-        this.absolutePath = resolve(process.cwd(), filepath);
-        this.type = type;
+        const [, , type, filepath] = process.argv;
+        if(filepath != null){
+            this.absolutePath = resolve(process.cwd(), filepath);
+        }
+        this.type = type; //types are add, update, list
         //only add items from JSON file
         //check if inputs are correct
-        if(this.absolutePath == null || this.absolutePath.length < 1){
+        if((this.absolutePath == null || this.absolutePath.length < 1) && this.type != 'list'){
             console.error('File path error, ${this.absolutePath}');
             this.exit(1);
         }
@@ -51,20 +53,25 @@ class addJsonFirestore {
     async populate(){
         let data = [];
 
-        try{
+        try{ //parse data in json file
             data = (JSON.parse(fs.readFileSync(this.absolutePath, {}), 'utf8'));
         } catch(e){
             console.error(e.message);
         }
-        console.log(data);
+        //console.log(data);
         if(data.length < 1){
             console.error('make sure JSON file has data');
             this.exit(1);
         }
         var i = 0;
-        data.forEach(item => {
+        data.forEach(item => { //for each item in data, do command on item (add, update ,etc)
             try{
-                this.add(item);
+                if(this.type == 'add'){
+                    this.add(item);
+                }
+                else if(this.type == 'update'){
+                    this.update(item);
+                }
             }catch(e){
                 console.error(e.message);
             }
@@ -125,17 +132,30 @@ class addJsonFirestore {
     }
 
     update(item){
-        console.log('updating item ${item.id}');
-        return this.db.collection(this.collection).update(Object.assign({}, item))
-        .then(() => true)
-        .catch((e) => console.error(e.message));
+        var name = item.repo
+        var str = name.toString();
+        db.collection("repositories").doc(str).update(item)
+        .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+        });
     }
 
     exit(code){
         return process.exit(code);
     }
+
+    
+}
+//commands:
+//node ./firestore/jsonFirestore.js (type: add, update, list) (json file, usually module.json)
+const populateFirestore = new addJsonFirestore();
+if(populateFirestore.type == 'add' || populateFirestore.type == 'update'){
+    populateFirestore.populate(); //reads json file, adds each data entry into firestore as a document
+}else if(populateFirestore.type == 'list'){
+    populateFirestore.listall(); //lists all documents in database
 }
 
-const populateFirestore = new addJsonFirestore();
-populateFirestore.populate();
-populateFirestore.listall();
+
