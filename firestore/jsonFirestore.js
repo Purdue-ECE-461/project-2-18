@@ -29,19 +29,14 @@ const db = admin.firestore();
 class addJsonFirestore {
     constructor() {
         
-        this.db = db;
-        const [, , filepath, type, collectionName] = process.argv;
+        this.db = db; //admin database access
+        const [, , filepath, type] = process.argv;
         this.absolutePath = resolve(process.cwd(), filepath);
-        this.collection = collectionName;
         this.type = type;
         //only add items from JSON file
         //check if inputs are correct
         if(this.absolutePath == null || this.absolutePath.length < 1){
             console.error('File path error, ${this.absolutePath}');
-            this.exit(1);
-        }
-        if(this.collection == null || this.collection.length < 1){
-            console.error('collection namee error, ${this.collection}');
             this.exit(1);
         }
         if(this.type == null){
@@ -50,7 +45,6 @@ class addJsonFirestore {
         }
         console.log("db:", this.db);
         console.log("absolute path:", this.absolutePath);
-        console.log("collection name:", this.collection);
         console.log("type: ", this.type);
     }
 
@@ -67,12 +61,13 @@ class addJsonFirestore {
         }
         var i = 0;
         data.forEach(item => {
-            
             try{
                 if(this.type == 'add'){
                     this.add(item);
                 }else if(this.type == 'update'){
                     this.update(item);
+                }else if(this.type == 'get'){
+                    this.get(item);
                 }
 
             }catch(e){
@@ -81,13 +76,14 @@ class addJsonFirestore {
             if(i == data.length - 1){
                 console.log('UPLOAD SUCCESS');
             }  
-            i++;          
+            i++;        
         });
     }
 
     add(item){
-        console.log(item)
-        db.collection("repositories").add(item)
+        var name = item.id
+        var str = name.toString();
+        db.collection("repositories").doc(str).set(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -97,7 +93,9 @@ class addJsonFirestore {
     }
 
     delete(item){
-        db.collection("repositories").delete(item)
+        var name = item.id
+        var str = name.toString();
+        db.collection("repositories").delete(str)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -107,7 +105,9 @@ class addJsonFirestore {
     }
 
     get(item){
-        var docRef = db.collection("repositories").doc(item);
+        var name = item.id
+        var str = name.toString();
+        var docRef = db.collection("repositories").doc(str);
         docRef.get().then((doc) => {
             if (doc.exists) {
                 console.log("Document data:", doc.data());
@@ -143,4 +143,4 @@ class addJsonFirestore {
 
 const populateFirestore = new addJsonFirestore();
 populateFirestore.populate();
-//populateFirestore.listall();
+populateFirestore.listall();
