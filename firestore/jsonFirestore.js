@@ -1,4 +1,4 @@
-const { initializeApp } = require('firebase/app');
+const { initializeApp } = require('firebase-admin/app');
 const {getFirestore, collection, setDoc, getDocs, doc, addDoc} = require('firebase/firestore/lite');
 require("firebase-admin/firestore");
 const fs = require('fs');
@@ -14,10 +14,17 @@ const firebaseConfig = {
     // appId: "1:944914465522:web:8ba83369a55d24eae3066b",
     // measurementId: "G-L9ZZVWGDKG"
   };
-  
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+var admin = require("firebase-admin");
+
+var serviceAccount = require("/Users/kshaunishsoni/461project2/project-2-18-1/firestore/project-group18-firebase-adminsdk-2llpi-72a9d84369.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://project-group18-default-rtdb.firebaseio.com"
+  });
+
+
+const db = admin.firestore();
 
 class addJsonFirestore {
     constructor() {
@@ -47,7 +54,7 @@ class addJsonFirestore {
         console.log("type: ", this.type);
     }
 
-    async populate(){
+    populate(){
         let data = [];
         try{
             data = (JSON.parse(fs.readFileSync(this.absolutePath, {}), 'utf8'));
@@ -63,8 +70,8 @@ class addJsonFirestore {
            // console.log(item)
             try{
                 if(this.type == 'add'){
-                    const coll = collection(this.db, 'repositories')
-                    let x = setTimeout(() => {this.add(item, coll);}, 1000);
+                    const coll = collection(db, "repositories");
+                  //  this.add(item);
                 }else if(this.type == 'update'){
                     this.update(item);
                 }
@@ -81,16 +88,26 @@ class addJsonFirestore {
         this.listall();
     }
 
-    async add(item, coll){
-        const newDoc = await addDoc(coll, item);
-        console.log("new doc added at: ", newDoc.path);
+    async add(){
+        try {
+            const docRef = await addDoc(collection(db, "repositories"), {
+              first: "Alan",
+              middle: "Mathison",
+              last: "Turing",
+              born: 1912
+            });
+          
+            console.log("Document written with ID: ", docRef.id);
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
     }
 
     async listall(){
-        const querySnapshot = await getDocs(collection(this.db, this.collection));
-        querySnapshot.forEach((doc) => {
-          console.log(`${doc.id} => ${doc.data()}`);
-        });
+        const repos = collection(db, 'repositories');
+        const repoSnapshot = await getDocs(repos);
+        const repoList = repoSnapshot.docs.map(doc => doc.data());
+        return repoList;
     }
 
     update(item){
@@ -106,4 +123,4 @@ class addJsonFirestore {
 }
 
 const populateFirestore = new addJsonFirestore();
-populateFirestore.populate();  
+populateFirestore.listall();
