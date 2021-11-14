@@ -1,7 +1,7 @@
 .idea
 .vscode
-ranking_modules/modules
 .DS_Store
+modules
 *.pyc
 *.log
 *.json
