@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from url import URL  # Import class data
+from ranking_modules.url import URL  # Import class data
 
 # Configure logging
 try:
@@ -35,12 +35,12 @@ url_array = []
 
 
 def get_urls():
-    file_name = 'tests/testFile.txt'
+    file_name = './ranking_modules/tests/testFile.txt'
     try:
         with open(file_name, 'r', encoding='UTF-8') as file:
             text = file.read()
         return text.split()
-    except Exception:
+    except FileNotFoundError:
         logging.error("ERROR: Specified file '%s' not found!\nExiting...", file_name)
         sys.exit(1)
 
@@ -88,12 +88,12 @@ def test_sort():
     url5.net_score = 0.4
     urls = [url1, url2, url3, url4, url5]
 
-    sorted_urls = sorted(urls, key=(lambda getNet: getNet.net_score), reverse=True)
+    sorted_urls = sorted(urls, key=(lambda get_net: get_net.net_score), reverse=True)
 
     idx = 0
     while idx < 4:
         assert sorted_urls[idx].net_score >= sorted_urls[idx + 1].net_score
-        idx = idx + 1
+        idx += 1
 
 
 def range_var(net_score):
