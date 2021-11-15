@@ -90,7 +90,6 @@ if FILE_NAME == "tests":
     print(f'{num_passed}/{total} tests cases passed. {coverage} line coverage achieved.')
 
     logging.info("\nTests completed, exiting...")
-    os.environ['LOG_LEVEL'] = prevLogLevel  # Return to original log level
     shutil.rmtree('repo', ignore_errors=True)
     sys.exit(0)
 
