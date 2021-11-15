@@ -315,7 +315,7 @@ class URL:
         specific_deps = 0
 
         for version in dependencies.values():
-            if re.match('~?\d\.\d', version):
+            if re.match('~?\\d.\\d', version):
                 specific_deps += 1
 
         self.dependency = (1 - specific_deps/total_deps).__round__(2)
