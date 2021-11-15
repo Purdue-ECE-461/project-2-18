@@ -1,10 +1,11 @@
-import sys
-import shutil
+import json
+import logging
 import os
 import re
-import logging
-import json
+import shutil
+import sys
 from time import time
+
 from url import URL
 
 if len(sys.argv) != 2:

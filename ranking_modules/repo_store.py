@@ -1,5 +1,6 @@
-from git import Repo, GitCommandError
 import json
+
+from git import GitCommandError, Repo
 
 
 class RepoStore:

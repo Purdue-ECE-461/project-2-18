@@ -1,12 +1,13 @@
-import shutil
+import logging
 import os
 import re
-import logging
+import shutil
 import sys
 from datetime import datetime as dt  # pip install datetime
+
 import requests
-from github import Github, GithubException
 from git import Repo  # pip install GitPython
+from github import Github, GithubException
 from repo_store import RepoStore
 
 
