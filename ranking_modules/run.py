@@ -1,12 +1,11 @@
-import sys  # Import sys for argv
-# from url import URL # Import class data
+import sys
 import shutil
-# import pytest #DEPENDENCIES: pip install pytest
 import os
 import re
 import logging
 import json
 from time import time
+from url import URL
 
 if len(sys.argv) != 2:
     print("\ncorrect format: ./python run.py <some-filename>.txt\n")
@@ -18,7 +17,6 @@ if FILE_NAME == "install":
     sys.exit(0)
 
 
-from url import URL  # Import class data after dependencies are installed
 
 url_data = URL()
 url_array = []
@@ -65,7 +63,7 @@ if FILE_NAME == "tests":
     with open('tests/log.txt', 'r', encoding='UTF-8') as testLog:
         results = testLog.read()
 
-    num_passed = re.search('\d* passed', results)
+    num_passed = re.search('\\d* passed', results)
     if num_passed is not None:
         if not num_passed[0][0:-7] == '':
             num_passed = int(num_passed[0][0:-7])
@@ -74,7 +72,7 @@ if FILE_NAME == "tests":
     else:
         num_passed = 0
 
-    num_failed = re.search('\d* failed', results)
+    num_failed = re.search('\\d* failed', results)
     if num_failed is not None:
         if not num_failed[0][0:-7] == '':
             num_failed = int(num_failed[0][0:-7])
@@ -83,7 +81,7 @@ if FILE_NAME == "tests":
     else:
         num_failed = 0
 
-    coverage = re.findall('\d{1,3}%', results)[-1]
+    coverage = re.findall('\\d{1,3}%', results)[-1]
     total = num_passed + num_failed
 
     print(f'Total: {total}')

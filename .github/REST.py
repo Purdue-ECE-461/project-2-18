@@ -2,7 +2,6 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-import url
 
 def read(db):
     users_ref = db.collection(u'URLS')
@@ -10,6 +9,7 @@ def read(db):
 
     for doc in docs:
         print(f'{doc.id} => {doc.to_dict()}')
+
 
 def post(db):
     doc_ref = db.collection(u'URLS').document(u'test')
@@ -19,7 +19,8 @@ def post(db):
         u'born': 1815
     })
     print("new url added")
-#store in documents, search through documents
+    # store in documents, search through documents
+
 
 def main():
     cred = credentials.ApplicationDefault()
@@ -30,6 +31,7 @@ def main():
     db = firestore.client()
     post(db)
     read(db)
+
 
 if __name__ == "__main__":
     main()
