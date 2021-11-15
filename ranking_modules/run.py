@@ -62,19 +62,19 @@ if FILE_NAME == "tests":
     with open('tests/log.txt', 'r', encoding='UTF-8') as testLog:
         results = testLog.read()
 
-    num_passed = re.search('\\d* passed', results)
-    if num_passed is not None:
-        if not num_passed[0][0:-7] == '':
-            num_passed = int(num_passed[0][0:-7])
+    search = re.search('\\d* passed', results)
+    if search is not None:
+        if not search[0][0:-7] == '':
+            num_passed = int(search[0][0:-7])
         else:
             num_passed = 0
     else:
         num_passed = 0
 
-    num_failed = re.search('\\d* failed', results)
-    if num_failed is not None:
-        if not num_failed[0][0:-7] == '':
-            num_failed = int(num_failed[0][0:-7])
+    search = re.search('\\d* failed', results)
+    if search is not None:
+        if not search[0][0:-7] == '':
+            num_failed = int(search[0][0:-7])
         else:
             num_failed = 0
     else:
@@ -137,12 +137,12 @@ for url_idx in URLs:
     url_array.append(url_data)
 
 sorted_urls = sorted(url_array, key=(lambda get_net: get_net.net_score), reverse=True)
-url_data = []
+url_scores = []
 for url in sorted_urls:
     print(url.url + ' ' + str(url.net_score) + ' ' + str(url.ramp_up) + ' ' + str(url.correctness) + ' ' + str(
         url.bus_factor) +
           ' ' + str(url.response) + ' ' + str(url.dependency) + ' ' + str(url.license))
-    url_data.append(url.make_dict())
+    url_scores.append(url.make_dict())
 
 
 with open('modules.json', 'w') as file:
