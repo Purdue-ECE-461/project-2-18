@@ -8,6 +8,7 @@ from datetime import datetime as dt  # pip install datetime
 import requests  # pip install requests
 from git import Repo  # pip install GitPython
 from github import Github, GithubException
+
 from ranking_modules.repo_store import RepoStore
 
 
