@@ -35,7 +35,7 @@ url_array = []
 
 
 def get_urls():
-    file_name = './ranking_modules/tests/testFile.txt'
+    file_name = './ranking_modules/tests/test.txt'
     try:
         with open(file_name, 'r', encoding='UTF-8') as file:
             text = file.read()
