@@ -17,7 +17,6 @@ if FILE_NAME == "install":
     sys.exit(0)
 
 
-
 url_data = URL()
 url_array = []
 
