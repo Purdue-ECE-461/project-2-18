@@ -26,8 +26,12 @@ jobs:
         pip install PyGithub
         pip install datetime
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+    
     - name: Test with pytest
       run: |
         # calling via python will also add the current directory to sys.path
         python -m pytest
+      env:
+        LOG_LEVEL: 0
+        LOG_FILE: tmp.log
+        GITHUB_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
