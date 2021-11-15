@@ -69,7 +69,7 @@ def test_len():
             continue
 
         url_array.append(url_data)
-    assert len(url_array) == 10
+    assert len(url_array) == 2
 
 
 def test_sort():
