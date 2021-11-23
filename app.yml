@@ -1,0 +1,27 @@
+runtime: python3
+api_version: 1
+threadsafe: yes
+
+handlers:
+
+- url: /(.*\.css)
+  static_files: dist/Project-2-18-1/\1
+  upload: dist/Project-2-18-1/(.*\.css)
+  
+- url: /(.*\.html)
+  static_files: dist/Project-2-18-1/\1
+  upload: dist/Project-2-18-1/(.*\.html)
+
+
+# Site root.
+- url: /
+  static_files: dist/Project-2-18-1/index.html
+  upload: dist/Project-2-18-1/index.html
+
+# Catch-all rule, responsible from handling Angular application routes (deeplinks).
+- url: /.*
+  static_files: dist/Project-2-18-1/index.html
+  upload: dist/Project-2-18-1/index.html
+
+skip_files:
+- ^(?!dist)
