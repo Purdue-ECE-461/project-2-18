@@ -79,7 +79,10 @@ class addJsonFirestore {
                     this.add(item);
                 }
                 else if(this.type == 'update'){
-                    this.update(item);
+                    //check if item exists first
+                    if(this.get(item.repo) != 0){
+                        this.update(item);
+                    }
                 }
             }catch(e){
                 console.error(e.message);
@@ -121,6 +124,7 @@ class addJsonFirestore {
             } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
+                return 0;
             }
         }).catch((error) => {
             console.log("Error getting document:", error);
