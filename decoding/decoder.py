@@ -3,10 +3,10 @@ Reads a json files in the form of the POST PackageCreate example,
 decodes the base64 string to a zip file in the 'zipped_files' dir using the metadata name,
 and extracts that zip file into a named sub directory in the 'extracted_files' dir
 """
-from base64 import b64decode
 import binascii
-from zipfile import ZipFile
 import json
+from base64 import b64decode
+from zipfile import ZipFile
 
 
 def main():
