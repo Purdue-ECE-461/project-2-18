@@ -12,7 +12,7 @@ import json
 def main():
     with open('example.json', 'r') as json_file:
         data: dict = json.load(json_file)
-    
+
     try:
         encoded_zip = data['data']['Content']
     except KeyError:
