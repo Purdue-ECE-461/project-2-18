@@ -41,8 +41,6 @@ class URL:
 
     logging.basicConfig(filename=log_file, level=log_level)
 
-    def __init__(self, url='', net_score=0, ramp_up=0, correctness=0,
-                 bus_factor=0, response=0, valid_license=0, dependency=0):
         self.url = url
         self.owner = ''
         self.repo = ''
@@ -145,7 +143,7 @@ class URL:
         header = {'Authorization': f'token {pat}'}
 
         # Formats URL to 'https://api.github.com/repos/{owner}/{repo}/releases/latest'
-        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo\
+        formatted_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo \
                         + '/releases/latest'
 
         # Obtains value showing when repository was most recently updated as a datetime value, if possible
@@ -180,7 +178,6 @@ class URL:
 
         if os.path.isdir("repo"):
             if int(os.getenv('LOG_LEVEL')) > 1:
-
                 logging.info('Deleting exising repository folder...')
 
             shutil.rmtree('repo', ignore_errors=True)
@@ -320,7 +317,7 @@ class URL:
             if re.match('~?\\d.\\d', version):
                 specific_deps += 1
 
-        self.dependency = (1 - specific_deps/total_deps).__round__(2)
+        self.dependency = (1 - specific_deps / total_deps).__round__(2)
 
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
@@ -333,7 +330,20 @@ class URL:
         self.net_score = ((0.3 * self.bus_factor + 0.3 * self.response + 0.15 *
                            (self.correctness + self.ramp_up) + 0.1 * self.dependency) * self.license).__round__(2)
 
+    def is_ingestible(self, requirement: float = 0.5) -> bool:
+        scores = [self.net_score,
+                  self.ramp_up,
+                  self.correctness,
+                  self.bus_factor,
+                  self.response,
+                  self.license,
+                  self.dependency]
+        if any([score < requirement for score in scores]):
+            return False
+        return True
+
     def make_dict(self):
         return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
                 'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
-                'response': self.response, 'dependency': self.dependency, 'license': self.license}
+                'response': self.response, 'dependency': self.dependency, 'license': self.license,
+                'ingestible': self.is_ingestible()}
