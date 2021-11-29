@@ -41,6 +41,8 @@ class URL:
 
     logging.basicConfig(filename=log_file, level=log_level)
 
+    def __init__(self, url='', net_score=0.0, ramp_up=0.0, correctness=0.0,
+                 bus_factor=0.0, response=0.0, valid_license=0.0, dependency=0.0):
         self.url = url
         self.owner = ''
         self.repo = ''
@@ -134,7 +136,6 @@ class URL:
         pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
-
                 logging.error("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
             self.response = -1
