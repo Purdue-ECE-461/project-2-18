@@ -30,10 +30,10 @@ def main():
         print(exp)
         return
 
-    with open(f'./zip_files/{name}.zip', 'wb') as f:
+    with open(f'./zipped_files/{name}.zip', 'wb') as f:
         f.write(decoded_bytes)
 
-    with ZipFile(f'./zip_files/{name}.zip', 'r') as zipper:
+    with ZipFile(f'./zipped_files/{name}.zip', 'r') as zipper:
         zipper.extractall(path=f'./extracted_files/{name}')
 
 
