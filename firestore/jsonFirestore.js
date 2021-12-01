@@ -30,7 +30,7 @@ class addJsonFirestore {
     constructor() {
         
         this.db = db; //admin database access
-        const [, , type, filepath] = process.argv;
+        const [, , type, filetype, filepath] = process.argv;
         if(filepath != null){
             if(filepath.endsWith(".json")){ //checks if arg[2] is a .json file
                 this.absolutePath = resolve(process.cwd(), filepath);
@@ -42,6 +42,7 @@ class addJsonFirestore {
             }
             
         }
+        this.filetype = filetype
         this.type = type; //types are add, update, list
         //only add items from JSON file
         //check if inputs are correct
@@ -58,7 +59,43 @@ class addJsonFirestore {
         console.log("type: ", this.type);
         console.log("str: ", this.str);
     }
+    check_filetype(data){
+        if(this.filetype == null){
+            return false;
+        }
+        if(this.filetype == 'PackageRetrieve'){
+            if(data.metadata == null){
+                return false;
+            }
+            if(data.data == null){
+                return false;
+            }
+        }else if(this.filetype == 'PackageRate'){
+            if(data.netscore == null){
+                return false;
+            }
+            if(data.RampUp == null){
+                return false;
+            }
+            if(data.Correctness == null){
+                return false;
+            }
+            if(data.BusFactor == null){
+                return false;
+            }
+            if(data.LicenseScore == null){
+                return false;
+            }
+            if(data.ResponsiveMaintainer == null){
+                return false;
+            }
+            if(data.GoodPinningPractice == null){
+                return false;
+            }
+        }else if(this.filetype == 'CreateAuthToken'){
 
+        }
+    }
     async populate(){
         let data = [];
 
@@ -76,12 +113,13 @@ class addJsonFirestore {
         var i = 0;
         data.forEach(item => { //for each item in data, do command on item (add, update ,etc)
             try{
-                if(this.type == 'add'){
+                this.check_filetype();
+                if(this.type == 'POST'){
                     this.add(item);
                 }
-                else if(this.type == 'update'){
+                else if(this.type == 'PUSH'){
                     //check if item exists first
-                    if(this.get(item.repo) != 0){
+                    if(this.get(item.repo) != false){
                         this.update(item);
                     }
                 }
@@ -98,7 +136,7 @@ class addJsonFirestore {
     add(item){
         var name = item.repo
         var str = name.toString();
-        db.collection("repositories").doc(str).collection(type).doc(str).set(item)
+        db.collection("repositories").doc(str).collection(str).doc(this.filetype).set(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -108,7 +146,7 @@ class addJsonFirestore {
     }
 
     delete(str){ //input repo name, delete repo from firestore.
-        db.collection("repositories").delete(str)
+        db.collection("repositories").doc(str).collection(str).delete(this.filetype)
         .then((docRef) => {
             console.log("Document deleted with ID: ", docRef.id);
         })
@@ -118,18 +156,19 @@ class addJsonFirestore {
     }
 
     get(str){ //input repo name, will return repo information in the form of a JSON tree
-        var docRef = db.collection("repositories").doc(str);
+        var docRef = db.collection("repositories").doc(str).collection(str).doc(this.filetype);
         docRef.get().then((doc) => {
             if (doc.exists) {
                 console.log("Document data:", doc.data());
             } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
-                return 0; //TODO: ERROR 400: No such package
+                return false; //TODO: ERROR 400: No such package
             }
         }).catch((error) => {
             console.log("Error getting document:", error);
         });
+        return true;
     }
 
     listall(){ //list all repositories in the database
@@ -144,7 +183,7 @@ class addJsonFirestore {
     update(item){ //if item already exists in database, then rewrite database with new information.
         var name = item.repo
         var str = name.toString();
-        db.collection("repositories").doc(str).update(item)
+        db.collection("repositories").doc(str).collection(str).doc(this.filetype).update(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -160,16 +199,16 @@ class addJsonFirestore {
     
 }
 //commands:
-//node ./firestore/jsonFirestore.js (type: add, update, list) (json file, usually module.json)
+//node ./firestore/jsonFirestore.js (type: POST, PUSH, list, GET, DELETE) (filetype) (json file, usually module.json)
 const populateFirestore = new addJsonFirestore();
 //populateFirestore.get("cloudinary_npm"); check for get
-if(populateFirestore.type == 'add' || populateFirestore.type == 'update'){
+if(populateFirestore.type == 'POST' || populateFirestore.type == 'PUSH'){
     populateFirestore.populate(); //reads json file, adds each data entry into firestore as a document
 }else if(populateFirestore.type == 'list'){
     populateFirestore.listall(); //lists all documents in database
-}else if(populateFirestore.type == 'get'){
+}else if(populateFirestore.type == 'GET'){
     populateFirestore.get(populateFirestore.str); //gets the information for the selected repository
-}else if(populateFirestore.type == 'delete'){
+}else if(populateFirestore.type == 'DELETE'){
     populateFirestore.delete(populateFirestore.str); //deletes repository and info from firestore
 }
 
