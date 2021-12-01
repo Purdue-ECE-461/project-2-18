@@ -125,7 +125,7 @@ class addJsonFirestore {
             } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
-                return 0;
+                return 0; //TODO: ERROR 400: No such package
             }
         }).catch((error) => {
             console.log("Error getting document:", error);
