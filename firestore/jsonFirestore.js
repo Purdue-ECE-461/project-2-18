@@ -35,7 +35,7 @@ class addJsonFirestore {
             if(filepath.endsWith(".json")){ //checks if arg[2] is a .json file
                 this.absolutePath = resolve(process.cwd(), filepath);
             }else{
-                if(type == 'get'){ //if not and type == get, then input str.
+                if(type == 'get' || type == 'delete'){ //if not and type == get, then input str.
                     this.str = filepath;
                     this.absolutePath = filepath;
                 }
@@ -67,6 +67,7 @@ class addJsonFirestore {
         } catch(e){
             console.error(e.message);
         }
+
         //console.log(data);
         if(data.length < 1){
             console.error('make sure JSON file has data');
@@ -97,7 +98,7 @@ class addJsonFirestore {
     add(item){
         var name = item.repo
         var str = name.toString();
-        db.collection("repositories").doc(str).set(item)
+        db.collection("repositories").doc(str).collection(type).doc(str).set(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -167,7 +168,9 @@ if(populateFirestore.type == 'add' || populateFirestore.type == 'update'){
 }else if(populateFirestore.type == 'list'){
     populateFirestore.listall(); //lists all documents in database
 }else if(populateFirestore.type == 'get'){
-    populateFirestore.get(populateFirestore.str);
+    populateFirestore.get(populateFirestore.str); //gets the information for the selected repository
+}else if(populateFirestore.type == 'delete'){
+    populateFirestore.delete(populateFirestore.str); //deletes repository and info from firestore
 }
 
 
