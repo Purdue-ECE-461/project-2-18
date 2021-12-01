@@ -1,7 +1,7 @@
 """
 Reads a json files in the form of the POST PackageCreate example,
 decodes the base64 string to a zip file in the 'zipped_files' dir using the metadata name,
-and extracts that zip file into a named sub directory in the 'extracted_files' dir
+and extracts that zip file into a named subdirectory in the 'extracted_files' dir
 """
 import binascii
 import json

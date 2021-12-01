@@ -75,7 +75,7 @@ class URL:
         owner_string = re.search('.com/.*/', self.url)
         try:
             self.owner = owner_string.group()[5:-1]
-        except Exception:
+        except AttributeError:
             logging.error("Invalid URL '%s', skipping tests", self.url)
             self.owner = -1
 
@@ -85,7 +85,7 @@ class URL:
         repo_string = re.search(self.owner + '/.*', self.url)
         try:
             self.repo = repo_string.group()[len(self.owner) + 1:]
-        except Exception:
+        except AttributeError:
             logging.error("Invalid URL '%s', skipping tests", self.url)
 
             self.repo = -1
@@ -114,7 +114,7 @@ class URL:
         response = requests.get(formatted_url, headers=header, params={'per_page': 100})
         try:
             num_contributors = len(response.json()) + 1
-        except Exception:
+        except requests.exceptions.JSONDecodeError:
             logging.error("Error getting bus factor score with URL '%s'", self.url)
 
             self.bus_factor = -1
@@ -152,7 +152,7 @@ class URL:
         response = requests.get(formatted_url, headers=header)
         try:
             last_updated_str = response.json()['published_at']
-        except Exception:
+        except KeyError:
             logging.error("Error getting responsiveness score, no release data with URL '%s'", self.url)
 
             self.response = 0
@@ -164,7 +164,8 @@ class URL:
         time_delta = current_dt - last_updated_dt
 
         # Calculates responsiveness score
-        # Score starts at 100 and decreases by 5 points for every 30 days it has not been updated, starting from day 30
+        # Total score starts at 100 and decreases by 5 points for every 30 days it has not been updated,
+        # starting from day 30
         responsiveness = 100 - (5 * (time_delta.days // 30))
         if responsiveness >= 0:
             self.response = responsiveness / 100
@@ -248,7 +249,7 @@ class URL:
         # If there is an error acquiring the data, return a score of -1 and continue through program
         try:
             commit = commit_data["target_commitish"]
-        except Exception:
+        except KeyError:
             commit = 'master'
 
         api_url = 'https://api.github.com/repos/' + self.owner + '/' + self.repo + '/commits/' + commit
@@ -262,7 +263,7 @@ class URL:
         # print(content['commit']['verification']['verified'])
         try:
             status["state"]
-        except Exception:
+        except KeyError:
             logging.error("Error getting correctness score with URL '%s'", self.url)
 
             self.correctness = -1

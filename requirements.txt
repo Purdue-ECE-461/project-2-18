@@ -1,3 +1,4 @@
-PyGithub
-requests
-DateTime
+PyGithub~=1.55
+requests~=2.26.0
+DateTime~=4.3
+Django~=3.2
