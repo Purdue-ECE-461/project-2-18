@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 
 def main():
-    with open('example.json', 'r') as json_file:
+    with open('../tests/example.json', 'r') as json_file:
         data: dict = json.load(json_file)
 
     try:
