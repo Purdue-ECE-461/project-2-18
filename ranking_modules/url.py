@@ -9,7 +9,7 @@ import requests  # pip install requests
 from git import Repo  # pip install GitPython
 from github import Github, GithubException
 
-from repo_store import RepoStore
+from ranking_modules.repo_store import RepoStore
 
 
 class URL:
@@ -114,7 +114,7 @@ class URL:
         response = requests.get(formatted_url, headers=header, params={'per_page': 100})
         try:
             num_contributors = len(response.json()) + 1
-        except Exception:
+        except requests.exceptions.JSONDecodeError:
             logging.error("Error getting bus factor score with URL '%s'", self.url)
 
             self.bus_factor = -1
@@ -345,6 +345,7 @@ class URL:
         return True
 
     def make_dict(self):
-        return {'RampUp': self.ramp_up, 'Correctness': self.correctness,
-                'BusFactor': self.bus_factor, 'ResponsiveMaintainer': self.response,
-                'LicenseScore': self.license, 'GoodPinningPractice': self.dependency}
+        return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
+                'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
+                'response': self.response, 'dependency': self.dependency, 'license': self.license,
+                'ingestible': self.is_ingestible()}
