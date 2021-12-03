@@ -57,7 +57,7 @@ class URL:
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
 
-        html = requests.get(self.url, timeout=0.5).text
+        html = requests.get(self.url, timeout=1).text
         # Searches for GitHub URL in the raw html
         git_hub_url = re.search(r'("repository":".{0,100}","keywords")', html)
 
