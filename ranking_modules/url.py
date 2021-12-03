@@ -114,7 +114,7 @@ class URL:
         response = requests.get(formatted_url, headers=header, params={'per_page': 100})
         try:
             num_contributors = len(response.json()) + 1
-        except requests.exceptions.JSONDecodeError:
+        except Exception:
             logging.error("Error getting bus factor score with URL '%s'", self.url)
 
             self.bus_factor = -1
@@ -345,7 +345,6 @@ class URL:
         return True
 
     def make_dict(self):
-        return {'url': self.url, 'owner': self.owner, 'repo': self.repo, 'net score': self.net_score,
-                'ramp up score': self.ramp_up, 'correctness': self.correctness, 'bus factor': self.bus_factor,
-                'response': self.response, 'dependency': self.dependency, 'license': self.license,
-                'ingestible': self.is_ingestible()}
+        return {'RampUp': self.ramp_up, 'Correctness': self.correctness,
+                'BusFactor': self.bus_factor, 'ResposiveMaintainer': self.response,
+                'LicenseScore': self.license, 'GoodPinningPractice': self.dependency}
