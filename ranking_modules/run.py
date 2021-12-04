@@ -96,15 +96,30 @@ def main():
 
     start_time = time()
 
-    # Check for valid filename
-    try:
-        with open(file_name, 'r', encoding='UTF-8') as file:
-            text = file.read()
-    except FileNotFoundError:
-        logging.error("ERROR: Specified file '%s' not found!\nExiting...", file_name)
-        sys.exit(1)
+    if file_name.endswith('.txt'):
+        # Check for valid filename
+        try:
+            with open(file_name, 'r', encoding='UTF-8') as file:
+                text = file.read()
+                urls = text.split()
+        except FileNotFoundError:
+            logging.error("ERROR: Specified file '%s' not found!\nExiting...", file_name)
+            sys.exit(1)
 
-    urls = text.split()
+    elif file_name.endswith('.json'):
+        with open(file_name, 'r') as json_file:
+            data: dict = json.load(json_file)
+
+        try:
+            url = data['data']['URL']
+            urls = [url]
+        except KeyError:
+            logging.error("Package doesn't have a url key")
+            sys.exit(1)
+
+    else:
+        logging.error("Filetype not recognised!")
+        sys.exit(1)
 
     print('URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE '
           'RESPONSIVE_MAINTAINER_SCORE DEPENDENCY_SCORE LICENSE_SCORE')
@@ -144,7 +159,7 @@ def main():
         url_scores.append(url.make_dict())
 
     with open('modules.json', 'w') as file:
-        json.dump(url_data, file, indent="")
+        json.dump(url_scores, file, indent="")
 
     shutil.rmtree('repo', ignore_errors=True)
     logging.info("Successfully closing...")
