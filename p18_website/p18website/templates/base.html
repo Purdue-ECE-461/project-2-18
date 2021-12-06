@@ -3,11 +3,19 @@
 <head>
     <meta charset="utf-8">
     <title> {%block title %}Project18 Website{% endblock%}</title>
+
+    {% load static %}
+ 
+    <!-- use django static tag ton load js file and css file. -->
+    <script src="{% static 'p18_website/jsonFirestore.js' %}"></script>
+
 </head>
 <body>
 {% include 'nav.html'%}
     <main>
         {% block content %}
+
+</div>
         {% endblock %}
     </main>
 </body>

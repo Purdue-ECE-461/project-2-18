@@ -6,4 +6,46 @@
 <h1>
     Project 18 Front End
 </h1>
+<body onload="getListpaginated(1)">
+    Page:  <span id="myText"></span>
+    <br>
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <input type = "button" class = "repo">
+    <p id="demo" onclick="next()">Next</p>
+    <p id="demo" onclick="Previous()">Previous</p>
+    
+    <script>
+        var page_num = 1;
+        document.getElementById("myText").innerHTML = page_num;
+        function next(){
+            
+            page_num++;
+            document.getElementById("myText").innerHTML = page_num;
+            getListpaginated(page_num);
+            
+        }
+        function Previous(){
+            if(page_num == 1){
+                return;
+            }
+            page_num--;
+            document.getElementById("myText").innerHTML = page_num;
+            getListpaginated(page_num);
+            
+        }
+    </script>
+    
+
+
+
+</body>
+
 {% endblock %}

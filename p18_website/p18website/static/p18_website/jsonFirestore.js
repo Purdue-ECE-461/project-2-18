@@ -30,47 +30,46 @@ class addJsonFirestore {
     constructor() {
         
         this.db = db; //admin database access
-        const [, , type, filetype, filepath] = process.argv;
-        if(filepath != null){
-            if(filepath.endsWith(".json")){ //checks if arg[2] is a .json file
-                this.absolutePath = resolve(process.cwd(), filepath);
-            }else{
-                if(type == 'get' || type == 'delete'){ //if not and type == get, then input str.
-                    this.str = filepath;
-                    this.absolutePath = filepath;
-                }
-            }
+        // if(filepath != null){
+        //     if(filepath.endsWith(".json")){ //checks if arg[2] is a .json file
+        //         this.absolutePath = resolve(process.cwd(), filepath);
+        //     }else{
+        //         if(type == 'get' || type == 'delete'){ //if not and type == get, then input str.
+        //             this.str = filepath;
+        //             this.absolutePath = filepath;
+        //         }
+        //     }
             
-        }
-        this.filetype = filetype
-        this.type = type; //types are add, update, list
+        // }
+        // this.filetype = filetype
+        // this.type = type; //types are add, update, list
         //only add items from JSON file
         //check if inputs are correct
-        if((this.absolutePath == null || this.absolutePath.length < 1) && (this.type != 'list' || this.type != 'get')){
-            console.error('File path error, ', this.absolutePath);
-            this.exit(1);
-        }
-        if(this.type == null){
-            console.error('type error:', this.type);
-            this.exit(1);
-        }
+        // if((this.absolutePath == null || this.absolutePath.length < 1) && (this.type != 'list' || this.type != 'get')){
+        //     console.error('File path error, ', this.absolutePath);
+        //     this.exit(1);
+        // }
+        // if(this.type == null){
+        //     console.error('type error:', this.type);
+        //     this.exit(1);
+        // }
         console.log("db:", this.db);
-        console.log("absolute path:", this.absolutePath);
-        console.log("type: ", this.type);
-        console.log("str: ", this.str);
+        // console.log("absolute path:", this.absolutePath);
+        // console.log("type: ", this.type);
+        // console.log("str: ", this.str);
     }
-    check_filetype(data){
-        if(this.filetype == null){
+    check_filetype(data, filetype){
+        if(filetype == null){
             return false;
         }
-        if(this.filetype == 'PackageRetrieve'){
+        if(filetype == 'PackageRetrieve' || filetype == 'PackageCreate'){
             if(data.metadata == null){
                 return false;
             }
             if(data.data == null){
                 return false;
             }
-        }else if(this.filetype == 'PackageRate'){
+        }else if(filetype == 'PackageRate'){
             if(data.netscore == null){
                 return false;
             }
@@ -92,9 +91,15 @@ class addJsonFirestore {
             if(data.GoodPinningPractice == null){
                 return false;
             }
-        }else if(this.filetype == 'CreateAuthToken'){
-
+        }else if(filetype == 'CreateAuthToken'){
+            if(data.User == null){
+                return false;
+            }
+            if(data.Secret == null){
+                return false;
+            }
         }
+        return true;
     }
     async populate(){
         let data = [];
@@ -115,7 +120,12 @@ class addJsonFirestore {
             try{
                 this.check_filetype();
                 if(this.type == 'POST'){
-                    this.add(item);
+                    if(this.filetype == 'PackageCreate'){
+                        var str = item[0].name;
+                        var version = item[0].version;
+                        this.add_data(item, str, version);
+                    }
+                    
                 }
                 else if(this.type == 'PUSH'){
                     //check if item exists first
@@ -133,10 +143,9 @@ class addJsonFirestore {
         });
     }
 
-    add(item){
-        var name = item.repo
-        var str = name.toString();
-        db.collection("repositories").doc(str).collection(str).doc(this.filetype).set(item)
+    add_data(item, str, version, filetype){
+        
+        db.collection("repositories").doc(str).collection(version).doc(filetype).set(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -145,8 +154,18 @@ class addJsonFirestore {
         });
     }
 
-    delete(str){ //input repo name, delete repo from firestore.
-        db.collection("repositories").doc(str).collection(str).delete(this.filetype)
+    add_metadata(item,str){
+        db.collection("repositories").doc(str).set(item)
+        .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+        });
+    }
+
+    delete(str, version){ //input repo name, delete repo from firestore.
+        db.collection("repositories").doc(str).collection(version).delete(this.filetype)
         .then((docRef) => {
             console.log("Document deleted with ID: ", docRef.id);
         })
@@ -155,35 +174,55 @@ class addJsonFirestore {
         });
     }
 
-    get(str){ //input repo name, will return repo information in the form of a JSON tree
-        var docRef = db.collection("repositories").doc(str).collection(str).doc(this.filetype);
+    get(str, version){ //input repo name, will return repo information in the form of a JSON tree
+        var docRef = db.collection("repositories").doc(str).collection(version).doc(this.filetype);
         docRef.get().then((doc) => {
             if (doc.exists) {
                 console.log("Document data:", doc.data());
+                return doc.data();
             } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
-                return false; //TODO: ERROR 400: No such package
+                return null; //TODO: ERROR 400: No such package
             }
         }).catch((error) => {
             console.log("Error getting document:", error);
         });
-        return true;
+        return null;
+    }
+
+    get_name(name){
+        var docRef = db.collection("repositories").doc(name);
+        docRef.get().then((doc) => {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+                return doc.data();
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+                return null; //TODO: ERROR 400: No such package
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
+        return null;
     }
 
     listall(){ //list all repositories in the database
+        const repos = [];
         db.collection("repositories").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
+                repos.push(doc.name);
             });
         });
+        return repos;
     }
 
-    update(item){ //if item already exists in database, then rewrite database with new information.
+    update(item, version){ //if item already exists in database, then rewrite database with new information.
         var name = item.repo
         var str = name.toString();
-        db.collection("repositories").doc(str).collection(str).doc(this.filetype).update(item)
+        db.collection("repositories").doc(str).collection(version).doc(this.filetype).update(item)
         .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
         })
@@ -197,6 +236,35 @@ class addJsonFirestore {
     }
 
     
+}
+
+function getListpaginated(page_number){
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmBHC0o_DLr6KcOvsjt15dXVZe5idDQB0",
+        authDomain: "project-group18.firebaseapp.com",
+       // databaseURL: "https://project-group18-default-rtdb.firebaseio.com",
+        projectId: "project-group18",
+        // storageBucket: "project-group18.appspot.com",
+        // messagingSenderId: "944914465522",
+        // appId: "1:944914465522:web:8ba83369a55d24eae3066b",
+        // measurementId: "G-L9ZZVWGDKG"
+      };
+    var admin = require("firebase-admin");
+    
+    var serviceAccount = require("/Users/kshaunishsoni/461project2/project-2-18-1/firestore/project-group18-firebase-adminsdk-2llpi-72a9d84369.json");
+    
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: "https://project-group18-default-rtdb.firebaseio.com"
+      });
+      
+    const populateFirestore = new addJsonFirestore();
+    const repos = populateFirestore.listall(); 
+    repos.slice((page_number-1)*10, page_number*10);
+    repos.forEach(item => {
+        document.getElementsByClassName("repo").innerHTML = "<li>" + item + "</li>";;
+       
+    })
 }
 //commands:
 //node ./firestore/jsonFirestore.js (type: POST, PUSH, list, GET, DELETE) (filetype) (json file, usually module.json)

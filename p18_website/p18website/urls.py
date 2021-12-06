@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import views as authviews
 from django.urls import path
-
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
@@ -28,3 +28,5 @@ urlpatterns = [
     path('authenticate', authviews.LoginView.as_view(template_name="authenticate.html"), name="authenticate")
 
 ]
+
+urlpatterns += staticfiles_urlpatterns()
