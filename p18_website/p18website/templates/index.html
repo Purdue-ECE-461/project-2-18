@@ -21,6 +21,7 @@
     <input type = "button" class = "repo">
     <p id="demo" onclick="next()">Next</p>
     <p id="demo" onclick="Previous()">Previous</p>
+    
     <p id="Result"></p>
     <script>
         var page_num = 1;
@@ -41,7 +42,7 @@
             
         }
     </script>
-
+<p id="demo" onclick="getListpaginated(page_num)">Show List of Repositories</p>
 </body>
 
 {% endblock %}
