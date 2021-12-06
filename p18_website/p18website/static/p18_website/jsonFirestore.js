@@ -16,7 +16,7 @@ const firebaseConfig = {
   };
 var admin = require("firebase-admin");
 
-var serviceAccount = require("/Users/kshaunishsoni/461project2/project-2-18-1/firestore/project-group18-firebase-adminsdk-2llpi-72a9d84369.json");
+var serviceAccount = require("/Users/kshaunishsoni/461project2/project-2-18-1/p18_website/p18website/static/p18_website/project-group18-firebase-adminsdk-2llpi-72a9d84369.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -208,15 +208,28 @@ class addJsonFirestore {
         return null;
     }
 
-    listall(){ //list all repositories in the database
-        const repos = [];
+    listall(page_number){ //list all repositories in the database
+        const repos = new Array();
         db.collection("repositories").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
+                //console.log(doc.data());
                 // doc.data() is never undefined for query doc snapshots
-                repos.push(doc.name);
+                repos.push(doc.data());
+               // console.log(repos);
             });
+            //console.log(repos);
+            repos.slice((page_number-1)*10, page_number*10);
+            var e = "<br/>"; 
+            for(var i =0; i < repos.length; i++){
+                console.log(repos[i].repo);
+                document.getElementById("Result").innerHTML = repos[i].repo;
+            }
+            // repos.forEach(item => {
+            //     e += item + "<br/>";
+            //     console.log(item);
+            //     document.getElementsByClassName("repo").innerHTML = item;;
+            // })
         });
-        return repos;
     }
 
     update(item, version){ //if item already exists in database, then rewrite database with new information.
@@ -259,30 +272,36 @@ function initFirestore(){
 }
 
 function getListpaginated(page_number){
-    initFirestore();
+    //initFirestore();
     const populateFirestore = new addJsonFirestore();
-    const repos = populateFirestore.listall(); 
-    repos.slice((page_number-1)*10, page_number*10);
-    repos.forEach(item => {
-        
-        document.getElementsByClassName("repo").innerHTML = item;;
-       
-    })
+    const repos = populateFirestore.listall(page_number); 
+    console.log(repos);
+    
+   // var e = "<br/>"; 
+    // repos.forEach(item => {
+    //     e += item + "<br/>";
+    //     console.log(item);
+    //     document.getElementsByClassName("repo").innerHTML = item;;
+    // })
+    
+    //document.getElementById("Result").innerHTML = e;
+   
 }
 
 
 //commands:
 //node ./firestore/jsonFirestore.js (type: POST, PUSH, list, GET, DELETE) (filetype) (json file, usually module.json)
 const populateFirestore = new addJsonFirestore();
+getListpaginated(1);
 //populateFirestore.get("cloudinary_npm"); check for get
-if(populateFirestore.type == 'POST' || populateFirestore.type == 'PUSH'){
-    populateFirestore.populate(); //reads json file, adds each data entry into firestore as a document
-}else if(populateFirestore.type == 'list'){
-    populateFirestore.listall(); //lists all documents in database
-}else if(populateFirestore.type == 'GET'){
-    populateFirestore.get(populateFirestore.str); //gets the information for the selected repository
-}else if(populateFirestore.type == 'DELETE'){
-    populateFirestore.delete(populateFirestore.str); //deletes repository and info from firestore
-}
+// if(populateFirestore.type == 'POST' || populateFirestore.type == 'PUSH'){
+//     populateFirestore.populate(); //reads json file, adds each data entry into firestore as a document
+// }else if(populateFirestore.type == 'list'){
+//     populateFirestore.listall(); //lists all documents in database
+// }else if(populateFirestore.type == 'GET'){
+//     populateFirestore.get(populateFirestore.str); //gets the information for the selected repository
+// }else if(populateFirestore.type == 'DELETE'){
+//     populateFirestore.delete(populateFirestore.str); //deletes repository and info from firestore
+// }
 
 
