@@ -237,8 +237,7 @@ class addJsonFirestore {
 
     
 }
-
-function getListpaginated(page_number){
+function initFirestore(){
     const firebaseConfig = {
         apiKey: "AIzaSyAmBHC0o_DLr6KcOvsjt15dXVZe5idDQB0",
         authDomain: "project-group18.firebaseapp.com",
@@ -257,15 +256,21 @@ function getListpaginated(page_number){
         credential: admin.credential.cert(serviceAccount),
         databaseURL: "https://project-group18-default-rtdb.firebaseio.com"
       });
-      
+}
+
+function getListpaginated(page_number){
+    initFirestore();
     const populateFirestore = new addJsonFirestore();
     const repos = populateFirestore.listall(); 
     repos.slice((page_number-1)*10, page_number*10);
     repos.forEach(item => {
-        document.getElementsByClassName("repo").innerHTML = "<li>" + item + "</li>";;
+        
+        document.getElementsByClassName("repo").innerHTML = item;;
        
     })
 }
+
+
 //commands:
 //node ./firestore/jsonFirestore.js (type: POST, PUSH, list, GET, DELETE) (filetype) (json file, usually module.json)
 const populateFirestore = new addJsonFirestore();

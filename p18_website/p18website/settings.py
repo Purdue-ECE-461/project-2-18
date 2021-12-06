@@ -124,7 +124,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'firestore'),
+    os.path.join(BASE_DIR, 'static'),
+    '/Users/kshaunishsoni/461project2/project-2-18-1/p18_website/p18website/static',
 ]
 
 # Default primary key field type
