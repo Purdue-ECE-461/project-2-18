@@ -11,7 +11,7 @@ from p18website.serializers import PackageSerializer, RatingSerializer
 class CreatePackage(generics.ListCreateAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
-    serializer_class.save()
+
 
 class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
