@@ -1,7 +1,7 @@
-import ranking_modules.url
+from ranking_modules.url import URL
 
 
 # TODO
 def test_init():
-    my_url = ranking_modules.url.URL()
+    my_url = URL()
     assert my_url.url == ''
