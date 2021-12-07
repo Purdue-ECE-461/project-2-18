@@ -9,12 +9,6 @@ jobs:
     steps:
     - name: checkout source repo
       uses: actions/checkout@v2
-  
-    - name: Cache
-      uses: actions/cache@v2.1.7
-      with:
-        path: .mypy_cache
-        key: somekey
       
     - name: linting
       uses: alexanderdamiani/pylinter@v1.3.0
