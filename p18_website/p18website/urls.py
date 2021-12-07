@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.contrib.auth import views as authviews
 from django.urls import path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from p18website import views
+import views
 from django.conf.urls import url
 
 urlpatterns = [
@@ -28,7 +28,7 @@ urlpatterns = [
     path('reset', views.reset, name="reset"),
     path('authenticate', authviews.LoginView.as_view(template_name="authenticate.html"), name="authenticate"),
     url(r'^$', views.button),
-    url(r'^output', views.output,name="jsonFirestore"),
+    url(r'^output', views.output, name="jsonFirestore"),
     path('package/', views.CreatePackage.as_view()),
     path('package/byName/<str:name>/', views.PackagebyName.as_view()),
 ]
