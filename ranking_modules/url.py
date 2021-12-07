@@ -9,7 +9,7 @@ import requests  # pip install requests
 from git import Repo  # pip install GitPython
 from github import Github, GithubException
 
-from ranking_modules.repo_store import RepoStore
+from .repo_store import RepoStore
 
 
 class URL:
@@ -57,7 +57,7 @@ class URL:
     def convert_npm_to_github(self):
         logging.info("Converting URL %s...", self.url)
 
-        html = requests.get(self.url, timeout=1).text
+        html = requests.get(self.url, timeout=10).text
         # Searches for GitHub URL in the raw html
         git_hub_url = re.search(r'("repository":".{0,100}","keywords")', html)
 

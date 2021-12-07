@@ -20,7 +20,6 @@ def main():
     if file_name == "install":
         sys.exit(0)
 
-    url_data = URL()
     url_array = []
 
     # Configure logging
