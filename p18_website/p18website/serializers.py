@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ['name', 'id', 'version', 'content', 'url', 'JSProgram']
+        fields = ['id', 'name', 'version','url']
 
 class RatingSerializer(serializers.Serializer):
     BusFactor = serializers.DecimalField(max_digits = 3, decimal_places = 1)
