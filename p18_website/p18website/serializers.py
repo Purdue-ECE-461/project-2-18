@@ -2,7 +2,7 @@ from p18website.models import Package
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-class PackageSerializer(serializers.Modelserializer):
+class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
         fields = ['name', 'id', 'version', 'content', 'url', 'JSProgram']
@@ -14,3 +14,4 @@ class RatingSerializer(serializers.Serializer):
     ResponsiveMaintainer = serializers.DecimalField(max_digits = 3, decimal_places = 1)
     LicenseScore = serializers.DecimalField(max_digits = 3, decimal_places = 1)
     GoodPinningPractice = serializers.DecimalField(max_digits = 3, decimal_places = 1)
+
