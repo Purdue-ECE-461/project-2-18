@@ -9,6 +9,7 @@
 <body>
     Page:  <span id="myText"></span>
     <br>
+    <!-- <input type = "button" class = "repo">
     <input type = "button" class = "repo">
     <input type = "button" class = "repo">
     <input type = "button" class = "repo">
@@ -17,12 +18,11 @@
     <input type = "button" class = "repo">
     <input type = "button" class = "repo">
     <input type = "button" class = "repo">
-    <input type = "button" class = "repo">
-    <input type = "button" class = "repo">
+    <input type = "button" class = "repo"> -->
     <p id="demo" onclick="next()">Next</p>
     <p id="demo" onclick="Previous()">Previous</p>
     
-    <p id="Result"></p>
+    
     <script>
         var page_num = 1;
         document.getElementById("myText").innerHTML = page_num;
@@ -42,7 +42,8 @@
             
         }
     </script>
-<p id="demo" onclick="getListpaginated(page_num)">Show List of Repositories</p>
+<p id="demo" onclick="getListpaginated(1)">Show List of Repositories</p>
+<p id="Result"></p>
 </body>
 
 {% endblock %}

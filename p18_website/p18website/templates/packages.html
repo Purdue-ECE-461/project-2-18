@@ -36,10 +36,13 @@
         function logFile(event){
             let str = event.target.result;
 	        let json = JSON.parse(str);
-            //document.getElementById("json").textContent = JSON.stringify(json, undefined, 2);
-            var name = json.metadata.name;
-            document.getElementById("json").innerHTML = json.metadata;
-            ocument.getElementById("name").textContent = name;
+           // document.getElementById("json").textContent = JSON.stringify(json, undefined, 2);
+            document.getElementById("json").textContent = JSON.stringify(json.metadata, undefined, 2);
+            let metadata = JSON.stringify(json.metadata, undefined, 2);
+            let name = JSON.stringify(metadata.name, undefined, 2);
+            jsonFirestore.add_metadata(metadata, name);
+            document.getElementById("json").innerHTML = metadata;
+            document.getElementById("name").textContent = name;
         }
 
     </script>

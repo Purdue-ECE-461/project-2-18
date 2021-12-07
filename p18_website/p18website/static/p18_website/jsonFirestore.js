@@ -287,7 +287,10 @@ function getListpaginated(page_number){
     //document.getElementById("Result").innerHTML = e;
    
 }
-
+function addMetadata(metadata, name){
+    const populateFirestore = new addJsonFirestore();
+    populateFirestore.add_metadata(metadata, name);
+}
 
 //commands:
 //node ./firestore/jsonFirestore.js (type: POST, PUSH, list, GET, DELETE) (filetype) (json file, usually module.json)

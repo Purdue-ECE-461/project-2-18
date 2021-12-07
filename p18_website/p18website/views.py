@@ -1,6 +1,17 @@
 '''from django.http import HttpResponse
 #from django.template import loader'''
 from django.shortcuts import render
+from rest_framework import generics
+from p18website.models import Package
+from p18website.serializers import PackageSerializer, RatingSerializer
+
+class PackageList(generics.ListAPIView):
+    serializer = PackageSerializer
+    queryset = Package.objects.all()
+
+
+class CreatePackage(generics.CreateAPIView):
+    serializer = PackageSerializer
 
 
 def index(request):
