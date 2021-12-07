@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^$', views.button),
     url(r'^output', views.output,name="jsonFirestore"),
     path('package/', views.CreatePackage.as_view()),
-
+    path('package/byName/<str:name>/', views.PackagebyName.as_view()),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
