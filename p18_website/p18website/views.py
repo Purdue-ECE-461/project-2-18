@@ -1,26 +1,49 @@
 '''from django.http import HttpResponse
 #from django.template import loader'''
 from django.shortcuts import render
-from rest_framework import generics
-from rest_framework import mixins
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from p18website.models import Package
 from p18website.serializers import PackageSerializer, RatingSerializer
+from rest_framework import serializers
 
-class CreatePackage(generics.ListCreateAPIView):
+class CreatePackage(generics.CreateAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
-
+    
+class PackageList(generics.ListAPIView):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    
 
 class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
     lookup_field = 'name'
 
-class PackageDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Package.objects.all()
+class PackageVersion(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
+    queryset = Package.objects.all()
+    lookup_field = 'name'
+    lookup_field = 'version'
+    
+
+
+
+
+@api_view(['GET'])
+def getRate(request, package):
+    pck = Package.objects.get(package = package)
+    if(pck == None):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if(request.method == 'GET'):
+        #send package through rate packge
+        x = 1
+    serialized_data = RatingSerializer(data={'BusFactor': ratings[0], 'Correctness': ratings[1], 'RampUp': ratings[2], 'ResponsiveMaintainer': ratings[3], 'LicenseScore': ratings[4], 'GoodPinningPractice': ratings[5]})
+    serialized_data.is_valid()
+    return Response(data=serialized_data.data)
+
 
 def index(request):
     return render(request, 'index.html')
