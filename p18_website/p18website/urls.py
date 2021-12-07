@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name="index"),
     path('input', views.input, name="input"),
-    path('packages', views.PackageList.a_view(), name="packages"),
+    path('packages/', views.PackageList.as_view(), name="packages"),
     path('reset', views.reset, name="reset"),
     path('authenticate', authviews.LoginView.as_view(template_name="authenticate.html"), name="authenticate"),
     url(r'^$', views.button),

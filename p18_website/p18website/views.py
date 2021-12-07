@@ -2,6 +2,8 @@
 #from django.template import loader'''
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from p18website.models import Package
 from p18website.serializers import PackageSerializer, RatingSerializer
 
@@ -9,9 +11,13 @@ class PackageList(generics.ListAPIView):
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
 
-
 class CreatePackage(generics.CreateAPIView):
     serializer_class = PackageSerializer
+
+class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PackageSerializer
+    queryset = Package.objects.all()
+    lookup_field = 'name'
 
 
 def index(request):
