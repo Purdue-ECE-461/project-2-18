@@ -6,12 +6,12 @@ from p18website.models import Package
 from p18website.serializers import PackageSerializer, RatingSerializer
 
 class PackageList(generics.ListAPIView):
-    serializer = PackageSerializer
+    serializer_class = PackageSerializer
     queryset = Package.objects.all()
 
 
 class CreatePackage(generics.CreateAPIView):
-    serializer = PackageSerializer
+    serializer_class = PackageSerializer
 
 
 def index(request):
