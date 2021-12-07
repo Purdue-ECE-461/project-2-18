@@ -6,7 +6,7 @@ from rest_framework import generics
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 from .models import Package
-from .serializers import PackageSerializer, RatingSerializer
+from .serializers import PackageSerializer  # , RatingSerializer
 
 
 class CreatePackage(generics.ListCreateAPIView):
