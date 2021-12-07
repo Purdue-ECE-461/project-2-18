@@ -157,7 +157,7 @@ def main():
               ' ' + str(url.response) + ' ' + str(url.dependency) + ' ' + str(url.license))
         url_scores.append(url.make_dict())
 
-    with open('modules.json', 'w') as file:
+    with open('scores.json', 'w') as file:
         json.dump(url_scores, file, indent="")
 
     shutil.rmtree('repo', ignore_errors=True)
