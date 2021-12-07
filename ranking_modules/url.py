@@ -319,7 +319,7 @@ class URL:
             if re.match('~?\\d.\\d', version):
                 specific_deps += 1
 
-        self.dependency = (1 - specific_deps / total_deps).__round__(2)
+        self.dependency = (specific_deps / total_deps).__round__(2)
 
     def get_net_score(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
