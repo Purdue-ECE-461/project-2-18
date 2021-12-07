@@ -1,5 +1,5 @@
-'''from django.http import HttpResponse
-#from django.template import loader'''
+"""from django.http import HttpResponse
+#from django.template import loader"""
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -45,6 +45,7 @@ def getRate(request, package):
     return Response(data=serialized_data.data)
 
 
+
 def index(request):
     return render(request, 'index.html')
 
@@ -64,17 +65,19 @@ def reset(request):
 def authenticate(request):
     return render(request, 'authenticate.html')
 
+
 '''def dummy(request):
     return  HttpResponseRedirect('/')'''
 
-def button(request):
 
-    return render(request,'geniusvoice.html')
+def button(request):
+    return render(request, 'geniusvoice.html')
+
 
 def output(request):
-    
-    output_data = "Genius Voice eliminates friction. For years people have had to learn to interact with computers, we turn this around. We teach computers how to interact with humans through voice. This creates a seamless experience without losing the human touch."
+    output_data = "Genius Voice eliminates friction. For years people have had to learn to interact with computers," \
+                  "we turn this around. We teach computers how to interact with humans through voice." \
+                  "This creates a seamless experience without losing the human touch."
     website_link = "Visit our website: " + "https://www.geniusvoice.nl/"
-    
-    return render(request,"geniusvoice.html",{"output_data":output_data, "website_link":website_link})
-    
+
+    return render(request, "geniusvoice.html", {"output_data": output_data, "website_link": website_link})
