@@ -25,10 +25,15 @@ class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
 class PackageVersion(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
-    lookup_field = 'name'
-    lookup_field = 'version'
+    
     
 
+
+@api_view(['DELETE'])
+def reset(request):
+    if(request.method == 'DELETE'):
+        Package.objects.all().delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 
@@ -58,8 +63,8 @@ def packages(request):
     return render(request, 'packages.html')
 
 
-def reset(request):
-    return render(request, 'reset.html')
+# def reset(request):
+#     return render(request, 'reset.html')
 
 
 def authenticate(request):

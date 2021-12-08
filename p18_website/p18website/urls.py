@@ -25,12 +25,13 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('input', views.input, name="input"),
     path('packages/', views.PackageList.as_view()),
-    path('package/<str:name>/<str:version>/', views.PackageVersion.as_view()),
-    path('reset', views.reset, name="reset"),
+    path('package/<str:pk>/', views.PackageVersion.as_view()),
+    path('reset/', views.reset),
     path('authenticate', authviews.LoginView.as_view(template_name="authenticate.html"), name="authenticate"),
     url(r'^$', views.button),
     url(r'^output', views.output, name="jsonFirestore"),
     path('package/', views.CreatePackage.as_view()),
     path('package/byName/<str:name>/', views.PackagebyName.as_view()),
+
 
 ]
