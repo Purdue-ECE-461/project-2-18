@@ -1,5 +1,5 @@
 PyGithub~=1.55
 requests~=2.26.0
 DateTime~=4.3
-Django~=3.2
+Django==4.0
 djangorestframework~=3.12.4
