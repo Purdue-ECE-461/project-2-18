@@ -47,6 +47,7 @@ def getRate(request, package):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'GET':
         # send package through rate packge
+        
         x = 1
     serialized_data = RatingSerializer(data={'BusFactor': ratings[0], 'Correctness': ratings[1], 'RampUp': ratings[2],
                                              'ResponsiveMaintainer': ratings[3], 'LicenseScore': ratings[4],
