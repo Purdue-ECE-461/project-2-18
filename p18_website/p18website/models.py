@@ -10,17 +10,13 @@ class Package(models.Model):
     url = models.CharField(max_length=200, blank=True, default='')
     content = models.CharField(max_length=10000, blank=True, default='')
     JSProgram = models.CharField(max_length=200, blank=True, default='')
-    owner = models.ForeignKey('auth.User', related_name='package', on_delete=models.CASCADE)
-    highlighted = models.TextField()
+    # owner = models.ForeignKey('auth.User', related_name='package', on_delete=models.CASCADE, null=True)
+    # highlighted = models.TextField(null=True)
 
-    def save(self, *args, **kwargs):
-        """
-        Use the `pygments` library to create a highlighted HTML
-        representation of the code snippet.
-        """
-        lexer = get_lexer_by_name(self.)
-        linenos = 'table' if self.linenos else False
-        options = {'title': self.title} if self.title else {}
-        formatter = HtmlFormatter(style=self.style, linenos=linenos, full=True, **options)
-        self.highlighted = highlight(self.code, lexer, formatter)
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     """
+    #     Use the `pygments` library to create a highlighted HTML
+    #     representation of the code snippet.
+    #     """
+    #     self.highlighted = highlight(self.name, self.version)
+    #     super().save(*args, **kwargs)

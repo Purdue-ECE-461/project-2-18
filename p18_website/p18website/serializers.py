@@ -15,8 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        owner = serializers.ReadOnlyField(source='owner.username')
-        fields = ['id', 'name', 'version', 'url', 'content', 'JSProgram', 'owner']
+       # owner = serializers.ReadOnlyField(source='owner.username')
+        fields = ['id', 'name', 'version', 'url', 'content', 'JSProgram']
 
 
 class RatingSerializer(serializers.Serializer):
