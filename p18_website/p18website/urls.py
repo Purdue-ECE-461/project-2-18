@@ -18,7 +18,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as authviews
 from django.urls import path
-import views
+from p18website import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
