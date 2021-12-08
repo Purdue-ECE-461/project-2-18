@@ -1,12 +1,24 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework import serializers
 # from django.template import loader
 # from django.http import HttpResponse
 from .models import Package
-from .serializers import PackageSerializer, RatingSerializer
+from .serializers import PackageSerializer, RatingSerializer, UserSerializer
+from django.contrib.auth.models import User
+from .userpermissions import IsOwnerOrReadOnly
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class CreatePackage(generics.CreateAPIView):
@@ -17,19 +29,24 @@ class CreatePackage(generics.CreateAPIView):
 class PackageList(generics.ListAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
     lookup_field = 'name'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PackageVersion(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
-    
-    
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 @api_view(['DELETE'])
@@ -71,8 +88,8 @@ def packages(request):
 #     return render(request, 'reset.html')
 
 
-def authenticate(request):
-    return render(request, 'authenticate.html')
+'''def authenticate(request):
+    return render(request, 'authenticate.html')'''
 
 
 '''def dummy(request):

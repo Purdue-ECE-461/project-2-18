@@ -9,15 +9,14 @@ Function views
 Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
+Including another URL conf
     1. Import include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 # from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import url
 from django.contrib import admin
-from django.contrib.auth import views as authviews
-from django.urls import path
+from django.urls import path, include
 from p18website import views
 
 urlpatterns = [
@@ -27,11 +26,13 @@ urlpatterns = [
     path('packages/', views.PackageList.as_view(), name="packages"),
     path('package/<str:pk>/', views.PackageVersion.as_view()),
     path('reset/', views.reset, name="reset"),
-    path('authenticate', authviews.LoginView.as_view(template_name="authenticate.html"), name="authenticate"),
-    url(r'^$', views.button),
-    url(r'^output', views.output, name="jsonFirestore"),
+    path('authenticate/', include('rest_framework.urls')),
+    #url(r'^$', views.button),
+    #url(r'^output', views.output, name="jsonFirestore"),
     path('package/', views.CreatePackage.as_view()),
     path('package/byName/<str:name>/', views.PackagebyName.as_view()),
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
 
 
 ]

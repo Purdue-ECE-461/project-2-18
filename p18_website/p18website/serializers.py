@@ -1,6 +1,13 @@
 from rest_framework import serializers
 
 from .models import Package
+from django.contrib.auth.models import User
+
+class UserSerializer(serializers.ModelSerializer):
+    #snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Package.objects.all())
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'owner']
 
 # from django.contrib.auth.models import User
 
@@ -8,7 +15,8 @@ from .models import Package
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ['id', 'name', 'version', 'url', 'content', 'JSProgram']
+        owner = serializers.ReadOnlyField(source='owner.username')
+        fields = ['id', 'name', 'version', 'url', 'content', 'JSProgram', 'owner']
 
 
 class RatingSerializer(serializers.Serializer):
