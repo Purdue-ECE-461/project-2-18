@@ -12,10 +12,11 @@ class RepoStore:
 
     def clone_repo(self):
         try:
-            print("Cloning...")
+            # print("Cloning...")
             Repo.clone_from(self.link, self.dir_location)
         except GitCommandError:
-            print("Repository already cloned!")
+            pass
+            # print("Repository already cloned!")
 
     def get_dependencies(self) -> dict:
         try:
