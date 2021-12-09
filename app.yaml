@@ -18,7 +18,7 @@
 # [START gaestd_py_django_app_yaml]
 runtime: python39
 
-# handlers:
+handlers:
 # This configures Google App Engine to serve the files in the app's static
 # directory.
 - url: /static
