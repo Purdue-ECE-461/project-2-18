@@ -26,9 +26,9 @@ if os.path.isfile(env_file):
 
     env.read_env(env_file)
 # ...
-elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
+elif os.environ.get("GCP_PROJECT_ID", None):
     # Pull secrets from Secret Manager
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    project_id = os.environ.get("GCP_PROJECT_ID")
 
     client = secretmanager.SecretManagerServiceClient()
     settings_name = os.environ.get('DJANGO_SETTINGS_MODULE', 'p18website.settings')
