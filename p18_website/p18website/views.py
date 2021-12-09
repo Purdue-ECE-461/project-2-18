@@ -2,9 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from rest_framework import serializers
-# from django.template import loader
-# from django.http import HttpResponse
+
 from .models import Package
 from .serializers import PackageSerializer, RatingSerializer, UserSerializer
 from django.contrib.auth.models import User
