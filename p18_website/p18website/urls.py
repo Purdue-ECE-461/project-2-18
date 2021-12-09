@@ -17,19 +17,16 @@ Including another URL conf
 from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
-from p18website import views
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name="index"),
-    path('input', views.input, name="input"),
     path('packages/', views.PackageList.as_view(), name="packages"),
     path('package/<str:pk>/', views.PackageVersion.as_view()),
     path('package/<str:pk>/rate', views.getRate, name = "rate"),
     path('reset/', views.reset, name="reset"),
     path('authenticate/', include('rest_framework.urls')),
-    #url(r'^$', views.button),
-    #url(r'^output', views.output, name="jsonFirestore"),
     path('package/', views.CreatePackage.as_view()),
     path('package/byName/<str:name>/', views.PackagebyName.as_view()),
     path('users/', views.UserList.as_view()),
