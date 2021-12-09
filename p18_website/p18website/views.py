@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 from .ranking_modules.url import URL
 
 
-
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -20,7 +19,6 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
 
 
 class CreatePackage(generics.CreateAPIView):
@@ -45,12 +43,10 @@ class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'name'
 
 
-
 class PackageVersion(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
-
 
 
 @api_view(['DELETE'])
@@ -58,7 +54,6 @@ def reset(request):
     if(request.method == 'DELETE'):
         Package.objects.all().delete()
         return Response(status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'])
@@ -99,39 +94,9 @@ def getRate(request, pk):
         return Response(status=status.HTTP_500)
 
 
-
 def index(request):
     return render(request, 'index.html')
 
 
-def input(request):
-    return render(request, 'input.html')
-
-
 def packages(request):
     return render(request, 'packages.html')
-
-
-# def reset(request):
-#     return render(request, 'reset.html')
-
-
-'''def authenticate(request):
-    return render(request, 'authenticate.html')'''
-
-
-'''def dummy(request):
-    return  HttpResponseRedirect('/')'''
-
-
-def button(request):
-    return render(request, 'geniusvoice.html')
-
-
-def output(request):
-    output_data = "Genius Voice eliminates friction. For years people have had to learn to interact with computers," \
-                  "we turn this around. We teach computers how to interact with humans through voice." \
-                  "This creates a seamless experience without losing the human touch."
-    website_link = "Visit our website: " + "https://www.geniusvoice.nl/"
-
-    return render(request, "geniusvoice.html", {"output_data": output_data, "website_link": website_link})
