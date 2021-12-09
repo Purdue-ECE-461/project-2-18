@@ -62,8 +62,8 @@ def reset(request):
 
 
 @api_view(['GET'])
-def getRate(request, package):
-    pck = Package.objects.get(package=package)
+def getRate(request, pk):
+    pck = Package.objects.get(pk=pk)
     if pck == None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'GET':
@@ -95,6 +95,7 @@ def getRate(request, package):
         serialized_data.is_valid()
         return Response(data=serialized_data.data)
     else:
+        
         return Response(status=status.HTTP_500)
 
 
