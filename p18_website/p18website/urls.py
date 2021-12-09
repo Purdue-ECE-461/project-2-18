@@ -18,6 +18,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +34,4 @@ urlpatterns = [
     path('users/', views.UserList.as_view()),
     path('users/<int:pk>/', views.UserDetail.as_view()),
 
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
