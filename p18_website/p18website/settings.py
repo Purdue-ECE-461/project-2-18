@@ -22,7 +22,7 @@ PROJ_DIR = os.path.join(BASE_DIR, "p18website")
 SECRET_KEY = 'django-insecure-w^_go6x_d@qn0x%51e3z5t#)^o7p9=5pqvq+tt1=xu_zu*$hw#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
      'project-group18.uc.r.appspot.com',
