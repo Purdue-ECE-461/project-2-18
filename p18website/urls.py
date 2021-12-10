@@ -26,7 +26,7 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('packages/', views.PackageList.as_view(), name="packages"),
     path('package/<str:pk>/', views.PackageVersion.as_view()),
-    path('package/<str:pk>/rate', views.getRate, name = "rate"),
+    path('package/<str:pk>/rate', views.getRate, name ="rate"),
     path('reset/', views.reset, name="reset"),
     path('authenticate/', include('rest_framework.urls')),
     path('package/', views.CreatePackage.as_view()),
