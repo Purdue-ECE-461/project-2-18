@@ -23,7 +23,7 @@ In order to run on local host
 
 pip install all requirements shown in requirements.txt
 
-navigate to the p18_website folder and run the following command
+run the following commands
 
 python3 manage.py makemigrations p18website
 
