@@ -38,10 +38,10 @@ else:
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w^_go6x_d@qn0x%51e3z5t#)^o7p9=5pqvq+tt1=xu_zu*$hw#'
+SECRET_KEY = env("SECRET_KEY")#'django-insecure-w^_go6x_d@qn0x%51e3z5t#)^o7p9=5pqvq+tt1=xu_zu*$hw#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")#True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'p18website.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {"default": env.db()
+    {"default": env.db()
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': BASE_DIR / 'db.sqlite3',
     }
