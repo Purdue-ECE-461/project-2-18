@@ -24,6 +24,7 @@ class URL:
 
     try:
         LOG_LEVEL = os.environ['LOG_LEVEL']
+        logging.error(f"GOT LOG_LEVEL: {LOG_LEVEL}")
     except KeyError:
         logging.error("Couldn't find environment variable for 'LOG_LEVEL'")
         sys.exit()
@@ -102,6 +103,7 @@ class URL:
         name = f"projects/{project_id}/secrets/{token}/versions/latest"
         pat = client.access_secret_version(name=name).payload.data.decode("UTF-8")
         # pat = os.getenv('GITHUB_TOKEN')
+        logging.error(f"GOT GITHUB_TOKEN: {pat}")
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
