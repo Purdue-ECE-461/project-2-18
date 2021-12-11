@@ -34,7 +34,7 @@ handlers:
   
 env_variables:
   LOG_LEVEL: "1"
-  LOG_FILE: "ranking.log"
+  LOG_FILE: "/tmp/ranking.log"
 
 # [END gaestd_py_django_app_yaml]
 # [END django_app]
