@@ -8,6 +8,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import environ
 import os
+import io
+import google.cloud from secretmanager
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
