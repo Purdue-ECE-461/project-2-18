@@ -8,11 +8,12 @@ from datetime import datetime as dt  # pip install datetime
 import requests  # pip install requests
 from git import Repo  # pip install GitPython
 from github import Github, GithubException
-
+from google.cloud import secretmanager
 from .repo_store import RepoStore
 
 
 class URL:
+
 
     # Get environment
     try:
@@ -94,7 +95,13 @@ class URL:
         if int(os.getenv('LOG_LEVEL')) > 0:
             logging.info("Getting bus factor URL %s...", self.url)
 
-        pat = os.getenv('GITHUB_TOKEN')
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+
+        client = secretmanager.SecretManagerServiceClient()
+        token = os.environ.get("SETTINGS_NAME", "GITHUB_TOKEN")
+        name = f"projects/{project_id}/secrets/{token}/versions/latest"
+        pat = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+        # pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
 
@@ -132,8 +139,13 @@ class URL:
     def get_responsiveness(self):
         if int(os.getenv('LOG_LEVEL')) > 0:
             logging.info("Getting responsiveness for URL %s...", self.url)
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
 
-        pat = os.getenv('GITHUB_TOKEN')
+            client = secretmanager.SecretManagerServiceClient()
+            token = os.environ.get("SETTINGS_NAME", "GITHUB_TOKEN")
+            name = f"projects/{project_id}/secrets/{token}/versions/latest"
+            pat = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+            # pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             if int(os.getenv('LOG_LEVEL')) > 0:
                 logging.error("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
@@ -232,8 +244,13 @@ class URL:
 
         if int(os.getenv('LOG_LEVEL')) > 0:
             logging.info("Getting correctness for URL %s...", self.url)
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
 
-        pat = os.getenv('GITHUB_TOKEN')
+            client = secretmanager.SecretManagerServiceClient()
+            token = os.environ.get("SETTINGS_NAME", "GITHUB_TOKEN")
+            name = f"projects/{project_id}/secrets/{token}/versions/latest"
+            pat = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+            # pat = os.getenv('GITHUB_TOKEN')
         if pat is None or pat == '':
             logging.error("ERROR: Bad credentials, setting net score to -1 for %s...", self.url)
 
@@ -290,7 +307,13 @@ class URL:
 
     def get_license(self):
 
-        git = Github(login_or_token=os.environ['GITHUB_TOKEN'])
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+
+        client = secretmanager.SecretManagerServiceClient()
+        token = os.environ.get("SETTINGS_NAME", "GITHUB_TOKEN")
+        name = f"projects/{project_id}/secrets/{token}/versions/latest"
+        pat = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+        git = Github(login_or_token=pat)
         repo = git.get_repo(self.url[19:])
         logging.info("Getting license for URL %s...", self.url)
 
