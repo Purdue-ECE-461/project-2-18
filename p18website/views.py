@@ -19,13 +19,13 @@ class UserDetail(generics.RetrieveAPIView):
 
 
 class CreatePackage(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+   # permission_classes = [permissions.IsAuthenticated]
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
 
 
 class PackageList(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+   # permission_classes = [permissions.IsAuthenticated]
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
     
@@ -34,14 +34,14 @@ class PackageList(generics.ListAPIView):
 
 
 class PackagebyName(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
     lookup_field = 'name'
 
 
 class PackageVersion(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     serializer_class = PackageSerializer
     queryset = Package.objects.all()
 
