@@ -30,7 +30,9 @@ handlers:
 # the entire handlers section) when there are no static files defined.
 - url: /.*
   script: auto
-  
+
+beta_settings:
+    cloud_sql_instances: project-group18:us-central1:sqldb461
   
 env_variables:
   LOG_LEVEL: "1"
