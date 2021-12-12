@@ -24,7 +24,7 @@ class URL:
 
     try:
         LOG_LEVEL = os.environ['LOG_LEVEL']
-        logging.error(f"GOT LOG_LEVEL: {LOG_LEVEL}")
+        #logging.error(f"GOT LOG_LEVEL: {LOG_LEVEL}")
     except KeyError:
         logging.error("Couldn't find environment variable for 'LOG_LEVEL'")
         sys.exit()

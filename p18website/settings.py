@@ -96,17 +96,18 @@ WSGI_APPLICATION = 'p18website.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'repositories',
-        'USER': 'ece461defaultadmin',
-        'PASSWORD': 'correcthorsebatterystaple123(!__+@**(A',
-        'HOST': "127.0.0.1",
-        'PORT': 8000,
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'repositories',
+        # 'USER': 'ece461defaultadmin',
+        # 'PASSWORD': 'correcthorsebatterystaple123(!__+@**(A',
+        # 'HOST': "104.197.42.215",
+        # 'PORT': 8000,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
     
         # "default": env.db()
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
+        
 
 }
 
