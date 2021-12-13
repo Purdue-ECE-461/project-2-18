@@ -1,0 +1,5 @@
+https://github.com/expressjs/express
+https://github.com/prettier/prettier
+https://github.com/lquixada/cross-fetch
+https://github.com/debug-js/debug
+https://github.com/inversify/InversifyJS

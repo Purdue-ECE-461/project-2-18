@@ -1,0 +1,50 @@
+{%extends 'base.html'%}
+
+{%block title %}Home{% endblock%}
+
+{% block content %}
+<h1>
+    REST
+    <!-- <form action="/action_page.php">
+        <input type="file" id="myFile" name="filename" onchange="add()">
+        <input type="submit">
+    </form> -->
+    <form id="upload">
+        <label for="file">File to upload</label>
+        <input type="file" id="file" accept=".json">
+    
+        <button>Upload</button>
+        <p id="json"></p>
+        <p id="name"></p>
+    </form>
+    
+    <script>
+        let form = document.querySelector('#upload');
+        let file = document.querySelector('#file');
+        form.addEventListener('submit', handleSubmit);
+
+        function handleSubmit (event) {
+            event.preventDefault();
+            if (!file.value.length){
+                return;
+            } 
+            let reader = new FileReader();
+            reader.onload = logFile;
+            reader.readAsText(file.files[0]);
+       
+        }
+        function logFile(event){
+            let str = event.target.result;
+	        let json = JSON.parse(str);
+           // document.getElementById("json").textContent = JSON.stringify(json, undefined, 2);
+            document.getElementById("json").textContent = JSON.stringify(json.metadata, undefined, 2);
+            let metadata = JSON.stringify(json.metadata, undefined, 2);
+            let name = JSON.stringify(metadata.name, undefined, 2);
+            jsonFirestore.add_metadata(metadata, name);
+            document.getElementById("json").innerHTML = metadata;
+            document.getElementById("name").textContent = name;
+        }
+
+    </script>
+</h1>
+{% endblock %}

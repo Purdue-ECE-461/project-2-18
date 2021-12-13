@@ -1,0 +1,12 @@
+.idea
+.vscode
+.DS_Store
+modules
+venv
+*.pyc
+*.log
+*.json
+node_modules
+project-1-17/original_url.py
+testing.py
+p18_website/main.py
