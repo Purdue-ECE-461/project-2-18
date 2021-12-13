@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import Package
 from .serializers import PackageSerializer, RatingSerializer, UserSerializer
 from django.contrib.auth.models import User
-from .ranking_modules.url import URL
+from .url import URL
 
 
 class UserList(generics.ListCreateAPIView):

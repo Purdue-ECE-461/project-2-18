@@ -9,7 +9,7 @@ import requests  # pip install requests
 from git import Repo  # pip install GitPython
 from github import Github, GithubException
 from google.cloud import secretmanager
-from .repo_store import RepoStore
+from .ranking_modules.repo_store import RepoStore
 
 
 class URL:
